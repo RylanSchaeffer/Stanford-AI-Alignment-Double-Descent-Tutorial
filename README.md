@@ -1,1 +1,1 @@
-# Stanford-AI-Alignment-Double-Descent-Tutorial
+# Stanford AI Alignment Double Descent Tutorial
