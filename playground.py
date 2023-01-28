@@ -103,7 +103,7 @@ for dataset_name, dataset_fn in regression_datasets:
     )
     plt.xlabel('Num. Training Samples')
     plt.axvline(x=X.shape[1], color='black', linestyle='--', label='Interpolation Threshold')
-    plt.title(f'{dataset_name} (Num Features: {X.shape[1]}, Num Repeats: {num_repeats})')
+    plt.title(f'{dataset_name} (Num Repeats: {num_repeats})')
     plt.yscale('log')
     plt.legend()
     # plt.show()
