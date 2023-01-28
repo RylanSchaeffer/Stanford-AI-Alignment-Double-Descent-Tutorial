@@ -55,7 +55,7 @@ regression_datasets = [
 ]
 
 
-num_repeats = 100
+num_repeats = 500
 for dataset_name, dataset_fn in regression_datasets:
 
     print('On dataset:', dataset_name)
@@ -80,7 +80,7 @@ for dataset_name, dataset_fn in regression_datasets:
 
             # First run the random data subset
             random_subset_indices = np.random.choice(
-                np.arange(0, X_train.shape[0]),
+                np.arange(X_train.shape[0]),
                 size=subset_size,
                 replace=False,
             )
