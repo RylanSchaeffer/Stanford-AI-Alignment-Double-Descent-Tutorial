@@ -84,18 +84,27 @@ for dataset_name, dataset_fn in regression_datasets:
                 size=subset_size,
                 replace=False,
             )
-            regr.fit(X_train[random_subset_indices], y_train[random_subset_indices])
+            X_train_subset = X_train[random_subset_indices]
+            y_train_subset = y_train[random_subset_indices]
+            regr.fit(X_train_subset, y_train_subset)
+            min_eigenvalue = np.square(np.min(np.linalg.svd(X_train_subset,
+                                                            full_matrices=False,
+                                                            compute_uv=False)))
             random_y_pred = regr.predict(X_test)
             random_test_mse = mean_squared_error(y_test, random_y_pred)
             dataset_test_loss_df.append({
                 'Dataset': dataset_name,
                 'Subset Size': subset_size,
                 'Test MSE': random_test_mse,
-                'Repeat Index': repeat_idx})
+                'Repeat Index': repeat_idx,
+                'Least Informative Eigenvalue': min_eigenvalue,
+            })
 
     dataset_test_loss_df = pd.DataFrame(dataset_test_loss_df)
 
     plt.close()
+    # Set figure size
+    plt.figure(figsize=(6, 5))
     sns.lineplot(
         data=dataset_test_loss_df,
         x='Subset Size',
@@ -110,5 +119,24 @@ for dataset_name, dataset_fn in regression_datasets:
     plt.savefig(f'double_descent_dataset={dataset_name}',
                 bbox_inches='tight',
                 dpi=300)
+
     plt.close()
+    plt.figure(figsize=(6, 5))
+    sns.lineplot(
+        data=dataset_test_loss_df,
+        x='Subset Size',
+        y='Least Informative Eigenvalue'
+    )
+    plt.xlabel('Num. Training Samples')
+    plt.ylabel('Least Informative Eigenvalue\nof ' + r'$X^T X$ (or equiv. $X X^T$)')
+    plt.axvline(x=X.shape[1], color='black', linestyle='--', label='Interpolation Threshold')
+    plt.title(f'{dataset_name} (Num Repeats: {num_repeats})')
+    plt.yscale('log')
+    plt.legend()
+    plt.savefig(f'least_informative_eigenvalue_dataset={dataset_name}',
+                bbox_inches='tight',
+                dpi=300)
+    plt.show()
+    plt.close()
+
 
