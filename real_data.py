@@ -55,7 +55,7 @@ regression_datasets = [
 ]
 
 
-num_repeats = 500
+num_repeats = 30
 for dataset_name, dataset_fn in regression_datasets:
 
     print('On dataset:', dataset_name)
@@ -63,67 +63,77 @@ for dataset_name, dataset_fn in regression_datasets:
     # Load the diabetes dataset
     X, y = dataset_fn(return_X_y=True)
 
-    dataset_test_loss_df = []
+    dataset_loss_df = []
     for repeat_idx in range(num_repeats):
-
-        # Split the data into training/testing sets
-        X_train, X_test, y_train, y_test = train_test_split(
-            X,
-            y,
-            random_state=repeat_idx,
-            test_size=.2,
-            shuffle=True)
 
         # subset_sizes = np.arange(10, X_train.shape[0], X_train.shape[0] // 20)
         subset_sizes = np.arange(1, 50, 1)
         for subset_size in subset_sizes:
 
-            # First run the random data subset
-            random_subset_indices = np.random.choice(
-                np.arange(X_train.shape[0]),
-                size=subset_size,
-                replace=False,
-            )
-            X_train_subset = X_train[random_subset_indices]
-            y_train_subset = y_train[random_subset_indices]
-            regr.fit(X_train_subset, y_train_subset)
-            min_eigenvalue = np.square(np.min(np.linalg.svd(X_train_subset,
+            print(f'Dataset: {dataset_name}, repeat_idx: {repeat_idx}, subset_size: {subset_size}')
+
+            # Split the data into training/testing sets
+            X_train, X_test, y_train, y_test = train_test_split(
+                X,
+                y,
+                random_state=repeat_idx,
+                test_size=X.shape[0] - subset_size,
+                shuffle=True)
+
+            regr.fit(X_train, y_train)
+            min_eigenvalue = np.square(np.min(np.linalg.svd(X_train,
                                                             full_matrices=False,
                                                             compute_uv=False)))
-            random_y_pred = regr.predict(X_test)
-            random_test_mse = mean_squared_error(y_test, random_y_pred)
-            dataset_test_loss_df.append({
+            y_train_pred = regr.predict(X_train)
+            train_mse = mean_squared_error(y_train, y_train_pred)
+            y_test_pred = regr.predict(X_test)
+            test_mse = mean_squared_error(y_test, y_test_pred)
+
+            dataset_loss_df.append({
                 'Dataset': dataset_name,
                 'Subset Size': subset_size,
-                'Test MSE': random_test_mse,
+                'Train MSE': train_mse,
+                'Test MSE': test_mse,
                 'Repeat Index': repeat_idx,
                 'Least Informative Eigenvalue': min_eigenvalue,
             })
 
-    dataset_test_loss_df = pd.DataFrame(dataset_test_loss_df)
+    dataset_loss_df = pd.DataFrame(dataset_loss_df)
 
     plt.close()
     # Set figure size
     plt.figure(figsize=(6, 5))
     sns.lineplot(
-        data=dataset_test_loss_df,
+        data=dataset_loss_df,
         x='Subset Size',
         y='Test MSE',
+        label='Test'
+    )
+    sns.lineplot(
+        data=dataset_loss_df,
+        x='Subset Size',
+        y='Train MSE',
+        label='Train'
     )
     plt.xlabel('Num. Training Samples')
+    plt.ylabel('Mean Squared Error')
     plt.axvline(x=X.shape[1], color='black', linestyle='--', label='Interpolation Threshold')
     plt.title(f'{dataset_name} (Num Repeats: {num_repeats})')
     plt.yscale('log')
+    ymax = 2 * max(dataset_loss_df.groupby('Subset Size')['Test MSE'].mean().max(),
+                     dataset_loss_df.groupby('Subset Size')['Train MSE'].mean().max())
+    ymin = 0.5 * dataset_loss_df.groupby('Subset Size')['Train MSE'].mean()[X.shape[1] + 1]
+    plt.ylim(bottom=ymin, top=ymax)
     plt.legend()
-    # plt.show()
     plt.savefig(f'double_descent_dataset={dataset_name}',
                 bbox_inches='tight',
                 dpi=300)
+    plt.show()
 
     plt.close()
     plt.figure(figsize=(6, 5))
     sns.lineplot(
-        data=dataset_test_loss_df,
+        data=dataset_loss_df,
         x='Subset Size',
         y='Least Informative Eigenvalue'
     )
