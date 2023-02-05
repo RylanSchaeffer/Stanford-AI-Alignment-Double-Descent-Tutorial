@@ -1,8 +1,18 @@
+import os
 from itertools import product
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+
+# Increase seaborn font size
+sns.set(font_scale=1.4)
+
+# Set style
+sns.set_style("whitegrid")
+
+# Set seed for reproducibility.
+np.random.seed(0)
 
 
 num_data_list = [10, 100, 1000]
@@ -27,6 +37,9 @@ df = pd.concat(df_results).reset_index(drop=True)
 df['num_features'] = df['num_features'].astype(int)
 df['num_data'] = df['num_data'].astype(int)
 
+results_dir = 'results'
+os.makedirs(results_dir, exist_ok=True)
+
 plt.close()
 g = sns.FacetGrid(
     data=df,
@@ -49,7 +62,7 @@ g.set(yscale = 'log')
 #     for col_idx in range(axes.shape[1]):
 #         axes[row_idx, col_idx].axvline(0, ls='--', c='k',
 #                                        label='Chance')
-plt.savefig(f'random_data_eigenvalue_distribution.png',
+plt.savefig(os.path.join(results_dir, f'random_data_eigenvalue_distribution.png'),
             bbox_inches='tight',
             dpi=300)
 plt.show()

@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import os
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -6,14 +7,13 @@ from sklearn import datasets, linear_model
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 
-# Set plot defaults.
-sns.set(style='ticks', font_scale=1.2)
-plt.rcParams["font.family"] = ["Times New Roman"]
-plt.rcParams["font.size"] = 25  # was previously 22
+
+# Set style
 sns.set_style("whitegrid")
 
 # Set seed for reproducibility.
 np.random.seed(0)
+
 
 # Create sklearn linear regression object
 regr = linear_model.LinearRegression(fit_intercept=False)
@@ -54,6 +54,9 @@ regression_datasets = [
     ('WHO Life Expectancy', load_who_life_expectancy)
 ]
 
+
+results_dir = 'results'
+os.makedirs(results_dir, exist_ok=True)
 
 num_repeats = 30
 for dataset_name, dataset_fn in regression_datasets:
@@ -125,7 +128,8 @@ for dataset_name, dataset_fn in regression_datasets:
     ymin = 0.5 * dataset_loss_df.groupby('Subset Size')['Train MSE'].mean()[X.shape[1] + 1]
     plt.ylim(bottom=ymin, top=ymax)
     plt.legend()
-    plt.savefig(f'double_descent_dataset={dataset_name}',
+    plt.savefig(os.path.join(results_dir,
+                             f'double_descent_dataset={dataset_name}'),
                 bbox_inches='tight',
                 dpi=300)
     plt.show()
@@ -143,7 +147,8 @@ for dataset_name, dataset_fn in regression_datasets:
     plt.title(f'{dataset_name} (Num Repeats: {num_repeats})')
     plt.yscale('log')
     plt.legend()
-    plt.savefig(f'least_informative_eigenvalue_dataset={dataset_name}',
+    plt.savefig(os.path.join(results_dir,
+                             f'least_informative_eigenvalue_dataset={dataset_name}'),
                 bbox_inches='tight',
                 dpi=300)
     plt.show()
