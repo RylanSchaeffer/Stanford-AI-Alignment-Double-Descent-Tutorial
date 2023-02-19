@@ -110,13 +110,13 @@ for dataset_name, dataset_fn in regression_datasets:
         data=dataset_loss_df,
         x='Subset Size',
         y='Test MSE',
-        label='Test'
+        label='Test',
     )
     sns.lineplot(
         data=dataset_loss_df,
         x='Subset Size',
         y='Train MSE',
-        label='Train'
+        label='Train',
     )
     plt.xlabel('Num. Training Samples')
     plt.ylabel('Mean Squared Error')

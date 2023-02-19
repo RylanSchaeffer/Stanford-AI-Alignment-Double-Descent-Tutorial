@@ -19,8 +19,8 @@ np.random.seed(0)
 
 
 num_data_list = [15]
-num_features_list = [1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 30, 35, 40, 45]
-num_repeat_list = list(range(3))
+num_features_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 30, 40, 50, 100, 200]
+num_repeat_list = list(range(30))
 
 results_dir = 'results/polynomial_regression'
 os.makedirs(results_dir, exist_ok=True)
@@ -32,9 +32,12 @@ def compute_y_from_x(X: np.ndarray):
     return np.add(2. * X, np.cos(X * 25))[:, 0]
 
 
-mse_list = []
 low, high = -1., 1.
 for num_data in num_data_list:
+    mse_list = []
+    results_num_data_dir = os.path.join(results_dir, f'num_data={num_data}')
+    os.makedirs(results_num_data_dir, exist_ok=True)
+
     # Generate test data.
     X_test = np.linspace(start=low, stop=high, num=1000).reshape(-1, 1)
     y_test = compute_y_from_x(X_test)
@@ -45,22 +48,22 @@ for num_data in num_data_list:
     # sns.scatterplot(x=X_train[:, 0], y=y_train, s=30, color='k', label='Data')
     plt.xlabel('x')
     plt.ylabel('y')
-    plt.savefig(os.path.join(results_dir, f'data.png'),
+    plt.savefig(os.path.join(results_num_data_dir, f'data.png'),
                 bbox_inches='tight',
                 dpi=300)
     # plt.show()
     plt.close()
 
     for num_features in num_features_list:
-        results_num_features_dir = os.path.join(results_dir, f'num_features={num_features}')
+        results_num_features_dir = os.path.join(results_num_data_dir, f'num_features={num_features}')
         os.makedirs(results_num_features_dir, exist_ok=True)
+        feature_degrees = 1 + np.arange(num_features).astype(int)
         for repeat_idx in num_repeat_list:
 
             # Sample training data.
             X_train = np.random.uniform(low=low, high=high, size=(num_data, 1))
             y_train = compute_y_from_x(X_train)
 
-            feature_degrees = np.arange(num_features)
             # Fit a polynomial regression model.
             X_train_poly = scipy.special.eval_legendre(
                 feature_degrees,
@@ -90,27 +93,38 @@ for num_data in num_data_list:
             plt.xlabel('x')
             plt.ylabel('y')
             plt.ylim(-3, 3)
-            plt.savefig(os.path.join(results_num_features_dir, f'repeat_idx={repeat_idx}.png'),
-                        bbox_inches='tight',
-                        dpi=300)
+            for extension in ['pdf', 'png']:
+                plt.savefig(os.path.join(results_num_features_dir, f'repeat_idx={repeat_idx}.{extension}'),
+                            bbox_inches='tight',
+                            dpi=300)
             # plt.show()
             plt.close()
 
-
-mse_df = pd.DataFrame(mse_list)
-sns.lineplot(data=mse_df,
-             x='Num. Parameters (Num Features)',
-             y='Test MSE',
-             hue='Num. Data',
-             label='Test')
-sns.lineplot(data=mse_df,
-             x='Num. Parameters (Num Features)',
-             y='Train MSE',
-             hue='Num. Data',
-             label='Train')
-plt.ylabel('MSE')
-plt.savefig(os.path.join(results_dir, f'mse.png'),
-            bbox_inches='tight',
-            dpi=300)
-# plt.show()
-plt.close()
+    mse_df = pd.DataFrame(mse_list)
+    plt.close()
+    sns.lineplot(data=mse_df,
+                 x='Num. Parameters (Num Features)',
+                 y='Test MSE',
+                 label='Test',
+                 )
+    sns.lineplot(data=mse_df,
+                 x='Num. Parameters (Num Features)',
+                 y='Train MSE',
+                 label='Train',
+                 )
+    plt.ylabel('Mean Squared Error')
+    plt.ylim(bottom=1e-3)
+    plt.yscale('log')
+    plt.xscale('log')
+    plt.title('Polynomial Regression')
+    plt.axvline(x=num_data,
+                color='black',
+                linestyle='--',
+                label='Interpolation Threshold')
+    plt.legend()
+    for extension in ['pdf', 'png']:
+        plt.savefig(os.path.join(results_num_data_dir, f'mse_num_data={num_data}.{extension}'),
+                    bbox_inches='tight',
+                    dpi=300)
+    plt.show()
+    plt.close()
