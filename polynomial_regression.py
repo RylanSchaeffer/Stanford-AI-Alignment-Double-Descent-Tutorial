@@ -48,9 +48,10 @@ for num_data in num_data_list:
     # sns.scatterplot(x=X_train[:, 0], y=y_train, s=30, color='k', label='Data')
     plt.xlabel('x')
     plt.ylabel('y')
-    plt.savefig(os.path.join(results_num_data_dir, f'data.png'),
-                bbox_inches='tight',
-                dpi=300)
+    for extension in ['pdf', 'png']:
+        plt.savefig(os.path.join(results_num_data_dir, f'data.{extension}'),
+                    bbox_inches='tight',
+                    dpi=300)
     # plt.show()
     plt.close()
 
