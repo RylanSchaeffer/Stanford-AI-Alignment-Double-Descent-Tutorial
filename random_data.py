@@ -37,7 +37,7 @@ df = pd.concat(df_results).reset_index(drop=True)
 df['num_features'] = df['num_features'].astype(int)
 df['num_data'] = df['num_data'].astype(int)
 
-results_dir = 'results'
+results_dir = 'results/random_data'
 os.makedirs(results_dir, exist_ok=True)
 
 plt.close()

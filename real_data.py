@@ -55,7 +55,7 @@ regression_datasets = [
 ]
 
 
-results_dir = 'results'
+results_dir = 'results/real_data'
 os.makedirs(results_dir, exist_ok=True)
 
 num_repeats = 30

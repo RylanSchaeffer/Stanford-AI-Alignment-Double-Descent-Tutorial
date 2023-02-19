@@ -18,9 +18,9 @@ sns.set_style("whitegrid")
 np.random.seed(0)
 
 
-num_data_list = [20]
-num_features_list = [1, 2, 3, 4, 5, 10, 15, 20, 40, 60]
-num_repeat_list = np.arange(5).tolist()
+num_data_list = [15]
+num_features_list = [1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 30, 35, 40, 45]
+num_repeat_list = list(range(3))
 
 results_dir = 'results/polynomial_regression'
 os.makedirs(results_dir, exist_ok=True)
@@ -32,75 +32,85 @@ def compute_y_from_x(X: np.ndarray):
     return np.add(2. * X, np.cos(X * 25))[:, 0]
 
 
+mse_list = []
 low, high = -1., 1.
 for num_data in num_data_list:
-
-    # Sample data from between low and high.
-    X_train = np.random.uniform(low=low, high=high, size=(num_data, 1))
-    X_test = np.linspace(low, high, 1000).reshape(-1, 1)
-    y_train = compute_y_from_x(X_train)
+    # Generate test data.
+    X_test = np.linspace(start=low, stop=high, num=1000).reshape(-1, 1)
     y_test = compute_y_from_x(X_test)
 
     # Plot the data.
     plt.close()
     sns.lineplot(x=X_test[:, 0], y=y_test, label='True Function')
-    sns.scatterplot(x=X_train[:, 0], y=y_train, s=30, color='k', label='Data')
+    # sns.scatterplot(x=X_train[:, 0], y=y_train, s=30, color='k', label='Data')
     plt.xlabel('x')
     plt.ylabel('y')
     plt.savefig(os.path.join(results_dir, f'data.png'),
                 bbox_inches='tight',
                 dpi=300)
-    plt.show()
+    # plt.show()
     plt.close()
 
-    # # Fit a linear regression model.
-    # regr.fit(X_train, y_train)
-    # y_test_pred = regr.predict(X_test)
-
     for num_features in num_features_list:
+        results_num_features_dir = os.path.join(results_dir, f'num_features={num_features}')
+        os.makedirs(results_num_features_dir, exist_ok=True)
+        for repeat_idx in num_repeat_list:
 
-        # Fit a polynomial regression model.
-        poly = PolynomialFeatures(degree=num_features, interaction_only=False)
-        X_train_poly = poly.fit_transform(X_train)
-        X_test_poly = poly.fit_transform(X_test)
-        # regr.fit(X_train_poly, y)
-        # if num_features < num_data:
-        beta_hat = np.linalg.pinv(X_train_poly) @ y_train
-        # y_test_pred = regr.predict(X_test_poly)
-        y_test_pred = X_test_poly @ beta_hat
+            # Sample training data.
+            X_train = np.random.uniform(low=low, high=high, size=(num_data, 1))
+            y_train = compute_y_from_x(X_train)
 
-        # Plot the polynomial fit data.
-        plt.close()
-        sns.lineplot(x=X_test[:, 0], y=y_test, label='True Function')
-        sns.scatterplot(x=X_train[:, 0], y=y_train, s=30, color='k', label='Data')
-        sns.lineplot(x=X_test[:, 0], y=y_test_pred, label=f'Num Param={X_train_poly.shape[1]}')
-        plt.xlabel('x')
-        plt.ylabel('y')
-        plt.ylim(-1.5, 1.5)
-        plt.savefig(os.path.join(results_dir, f'fit_num_params={num_features}.png'),
-                    bbox_inches='tight',
-                    dpi=300)
-        plt.show()
-        plt.close()
-
-        # Suppose we had a different realization of data. What would the fit look like?
-        for repeat_idx in range(1):
-            X_train_clone = np.random.uniform(low=low, high=high, size=(num_data, 1))
-            y_clone = np.cos(X_train_clone)[:, 0]
-            X_train_clone_poly = poly.fit_transform(X_train_clone)
-            regr.fit(X_train_clone_poly, y_clone)
-            y_test_pred_clone = regr.predict(X_test_poly)
+            feature_degrees = np.arange(num_features)
+            # Fit a polynomial regression model.
+            X_train_poly = scipy.special.eval_legendre(
+                feature_degrees,
+                X_train)
+            X_test_poly = scipy.special.eval_legendre(
+                feature_degrees,
+                X_test)
+            beta_hat = np.linalg.pinv(X_train_poly) @ y_train
+            y_train_pred = X_train_poly @ beta_hat
+            y_test_pred = X_test_poly @ beta_hat
+            train_mse = mean_squared_error(y_train, y_train_pred)
+            test_mse = mean_squared_error(y_test, y_test_pred)
+            mse_list.append({
+                'Num. Data': num_data,
+                'Num. Parameters (Num Features)': num_features,
+                'repeat_idx': repeat_idx,
+                'Train MSE': train_mse,
+                'Test MSE': test_mse,
+            })
+            print(f'num_data={num_data}, num_features={num_features}, repeat_idx={repeat_idx}, train_mse={train_mse:.4f}, test_mse={test_mse:.4f}')
 
             # Plot the polynomial fit data.
             plt.close()
             sns.lineplot(x=X_test[:, 0], y=y_test, label='True Function')
-            sns.scatterplot(x=X_train_clone[:, 0], y=y_clone, s=30, color='k', label='Data')
-            sns.lineplot(x=X_test[:, 0], y=y_test_pred_clone, label=f'Num Param={X_train_poly.shape[1]}')
+            sns.lineplot(x=X_test[:, 0], y=y_test_pred, label=f'Num Param={X_train_poly.shape[1]}')
+            sns.scatterplot(x=X_train[:, 0], y=y_train, s=30, color='k', label='Data')
             plt.xlabel('x')
             plt.ylabel('y')
-            plt.ylim(-1.5, 1.5)
-            plt.savefig(os.path.join(results_dir, f'fit_num_params={num_features}_repeat={repeat_idx}.png'),
+            plt.ylim(-3, 3)
+            plt.savefig(os.path.join(results_num_features_dir, f'repeat_idx={repeat_idx}.png'),
                         bbox_inches='tight',
                         dpi=300)
-            plt.show()
+            # plt.show()
             plt.close()
+
+
+mse_df = pd.DataFrame(mse_list)
+sns.lineplot(data=mse_df,
+             x='Num. Parameters (Num Features)',
+             y='Test MSE',
+             hue='Num. Data',
+             label='Test')
+sns.lineplot(data=mse_df,
+             x='Num. Parameters (Num Features)',
+             y='Train MSE',
+             hue='Num. Data',
+             label='Train')
+plt.ylabel('MSE')
+plt.savefig(os.path.join(results_dir, f'mse.png'),
+            bbox_inches='tight',
+            dpi=300)
+# plt.show()
+plt.close()
