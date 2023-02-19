@@ -101,6 +101,7 @@ for num_data in num_data_list:
             plt.close()
 
     mse_df = pd.DataFrame(mse_list)
+    mse_df.to_csv(os.path.join(results_num_data_dir, 'mse.csv'), index=False)
     plt.close()
     sns.lineplot(data=mse_df,
                  x='Num. Parameters (Num Features)',
