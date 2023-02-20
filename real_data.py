@@ -140,7 +140,7 @@ for dataset_name, dataset_fn in regression_datasets:
         data=dataset_loss_df,
         x='Subset Size',
         y='Smallest Non-Zero Singular Value',
-        label='Train',
+        color='green',
     )
     plt.xlabel('Num. Training Samples')
     plt.ylabel('Smallest Non-Zero Singular\nValue of Training Features ' + r'$X$')
