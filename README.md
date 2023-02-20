@@ -16,5 +16,5 @@ The tutorial will be available on arXiv (and LessWrong?).
 
 
 <p align="middle">
-  <img align="top" src="figures/double_descent_polynomial_regression_v2.pdf" width="99%" />
+  <img align="top" src="figures/double_descent_polynomial_regression_v2.png" width="99%" />
 </p>
