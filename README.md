@@ -12,7 +12,7 @@ The tutorial will be available on arXiv (and LessWrong?).
 ## Polynomial Regression on Synthetic Data
 
 <p align="middle">
-  <img align="top" src="figures/double_descent_polynomial_regression_v2.png" width="99%" />
+  <img align="top" src="figures/double_descent_polynomial_regression_horizontal.png" width="99%" />
 </p>
 
 ## Ordinary Linear Regression on Real Data
