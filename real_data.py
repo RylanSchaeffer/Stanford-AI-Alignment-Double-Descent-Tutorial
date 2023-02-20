@@ -84,9 +84,9 @@ for dataset_name, dataset_fn in regression_datasets:
                 shuffle=True)
 
             regr.fit(X_train, y_train)
-            min_eigenvalue = np.square(np.min(np.linalg.svd(X_train,
-                                                            full_matrices=False,
-                                                            compute_uv=False)))
+            min_singular_value = np.min(np.linalg.svd(X_train,
+                                                      full_matrices=False,
+                                                      compute_uv=False))
             y_train_pred = regr.predict(X_train)
             train_mse = mean_squared_error(y_train, y_train_pred)
             y_test_pred = regr.predict(X_test)
@@ -98,7 +98,7 @@ for dataset_name, dataset_fn in regression_datasets:
                 'Train MSE': train_mse,
                 'Test MSE': test_mse,
                 'Repeat Index': repeat_idx,
-                'Least Informative Eigenvalue': min_eigenvalue,
+                'Smallest Non-Zero Singular Value': min_singular_value,
             })
 
     dataset_loss_df = pd.DataFrame(dataset_loss_df)
@@ -109,14 +109,14 @@ for dataset_name, dataset_fn in regression_datasets:
     sns.lineplot(
         data=dataset_loss_df,
         x='Subset Size',
-        y='Test MSE',
-        label='Test',
+        y='Train MSE',
+        label='Train',
     )
     sns.lineplot(
         data=dataset_loss_df,
         x='Subset Size',
-        y='Train MSE',
-        label='Train',
+        y='Test MSE',
+        label='Test',
     )
     plt.xlabel('Num. Training Samples')
     plt.ylabel('Mean Squared Error')
@@ -139,16 +139,17 @@ for dataset_name, dataset_fn in regression_datasets:
     sns.lineplot(
         data=dataset_loss_df,
         x='Subset Size',
-        y='Least Informative Eigenvalue'
+        y='Smallest Non-Zero Singular Value',
+        label='Train',
     )
     plt.xlabel('Num. Training Samples')
-    plt.ylabel('Least Informative Eigenvalue\nof ' + r'$X^T X$ (or equiv. $X X^T$)')
+    plt.ylabel('Smallest Non-Zero Singular\nValue of Training Features ' + r'$X$')
     plt.axvline(x=X.shape[1], color='black', linestyle='--', label='Interpolation Threshold')
     plt.title(f'{dataset_name} (Num Repeats: {num_repeats})')
     plt.yscale('log')
     plt.legend()
     plt.savefig(os.path.join(results_dir,
-                             f'least_informative_eigenvalue_dataset={dataset_name}'),
+                             f'least_informative_singular_value_dataset={dataset_name}'),
                 bbox_inches='tight',
                 dpi=300)
     plt.show()
