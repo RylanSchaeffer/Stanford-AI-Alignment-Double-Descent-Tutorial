@@ -121,7 +121,8 @@ for dataset_name, dataset_fn in regression_datasets:
     plt.xlabel('Num. Training Samples')
     plt.ylabel('Mean Squared Error')
     plt.axvline(x=X.shape[1], color='black', linestyle='--', label='Interpolation Threshold')
-    plt.title(f'{dataset_name} (Num Repeats: {num_repeats})')
+    title = f'Ordinary Linear Regression on\n{dataset_name} (Num Repeats: {num_repeats})'
+    plt.title(title)
     plt.yscale('log')
     ymax = 2 * max(dataset_loss_df.groupby('Subset Size')['Test MSE'].mean().max(),
                      dataset_loss_df.groupby('Subset Size')['Train MSE'].mean().max())
@@ -145,7 +146,7 @@ for dataset_name, dataset_fn in regression_datasets:
     plt.xlabel('Num. Training Samples')
     plt.ylabel('Smallest Non-Zero Singular\nValue of Training Features ' + r'$X$')
     plt.axvline(x=X.shape[1], color='black', linestyle='--', label='Interpolation Threshold')
-    plt.title(f'{dataset_name} (Num Repeats: {num_repeats})')
+    plt.title(title)
     plt.yscale('log')
     plt.legend()
     plt.savefig(os.path.join(results_dir,
