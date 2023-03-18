@@ -92,6 +92,16 @@ for dataset_name, dataset_fn in regression_datasets:
             y_test_pred = regr.predict(X_test)
             test_mse = mean_squared_error(y_test, y_test_pred)
 
+            # Compute the fraction of the last training datum that lies outside the subspace
+            # of the all other training data.
+            last_train_datum = X_train[-1, :]
+            other_train_data = X_train[:-1, :]
+            if other_train_data.shape[0] == 0:
+                fraction_outside = 1.
+            else:
+                projection_of_last_train_datum_onto_other_train_data = np.linalg.pinv(other_train_data).T @ last_train_datum @ other_train_data
+                fraction_outside = np.linalg.norm(last_train_datum - projection_of_last_train_datum_onto_other_train_data) / np.linalg.norm(last_train_datum)
+
             dataset_loss_df.append({
                 'Dataset': dataset_name,
                 'Subset Size': subset_size,
@@ -99,12 +109,12 @@ for dataset_name, dataset_fn in regression_datasets:
                 'Test MSE': test_mse,
                 'Repeat Index': repeat_idx,
                 'Smallest Non-Zero Singular Value': min_singular_value,
+                'Fraction Outside': fraction_outside
             })
 
     dataset_loss_df = pd.DataFrame(dataset_loss_df)
 
     plt.close()
-    # Set figure size
     plt.figure(figsize=(6, 5))
     sns.lineplot(
         data=dataset_loss_df,
@@ -156,4 +166,23 @@ for dataset_name, dataset_fn in regression_datasets:
     plt.show()
     plt.close()
 
-
+    plt.close()
+    # Set figure size
+    plt.figure(figsize=(6, 5))
+    sns.lineplot(
+        data=dataset_loss_df,
+        x='Subset Size',
+        y='Fraction Outside',
+        label='Train',
+    )
+    plt.ylim(bottom=1e-5)
+    plt.xlabel('Num. Training Samples')
+    plt.ylabel('Fraction of Newest Training Datum\nOutside Subspace of Other Training Data')
+    plt.axvline(x=X.shape[1], color='black', linestyle='--', label='Interpolation Threshold')
+    plt.title(title)
+    plt.yscale('log')
+    plt.savefig(os.path.join(results_dir,
+                             f'fraction_outside_training_features_subspace={dataset_name}'),
+                bbox_inches='tight',
+                dpi=300)
+    plt.show()
