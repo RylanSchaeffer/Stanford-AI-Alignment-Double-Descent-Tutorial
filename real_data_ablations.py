@@ -171,11 +171,10 @@ for dataset_name, dataset_fn in regression_datasets:
                 fraction_outside = np.linalg.norm(last_train_datum - projection_of_last_train_datum_onto_other_train_data) / np.linalg.norm(last_train_datum)
 
 
-
     plt.close()
     fig, axes = plt.subplots(nrows=1,
                              ncols=4,
-                             figsize=(20, 5),
+                             figsize=(25, 5),
                              sharex=True,
                              sharey=True)
     fig.suptitle(f'Dataset: {dataset_name}')
@@ -217,7 +216,7 @@ for dataset_name, dataset_fn in regression_datasets:
         legend=False,
         ax=ax,
         hue_norm=LogNorm(),
-        palette='OrRd_r',
+        palette='PuBu',
     )
     sns.lineplot(
         data=dataset_loss_no_small_singular_values_df,
@@ -226,7 +225,7 @@ for dataset_name, dataset_fn in regression_datasets:
         hue='Singular Value Cutoff',
         ax=ax,
         hue_norm=LogNorm(),
-        palette='OrRd_r',
+        palette='OrRd',
     )
     ax.set_xlabel('Num. Training Samples')
     ax.set_title('No Small Singular Values')
@@ -236,21 +235,21 @@ for dataset_name, dataset_fn in regression_datasets:
     ax = axes[2]
     dataset_loss_no_residuals_in_ideal_fit_df = pd.DataFrame(dataset_loss_no_residuals_in_ideal_fit_df)
     ax.plot([1, dataset_loss_no_residuals_in_ideal_fit_df['Subset Size'].max()],
-            [ymin, ymin],
+            [1.1 * ymin, 1.1 * ymin],
             color='tab:blue',
-            linestyle='--',
             label='Train = 0')
     sns.lineplot(
         data=dataset_loss_no_residuals_in_ideal_fit_df,
         x='Subset Size',
         y=f'Test MSE',
-        label='Test',
+        label=r'Test $\neq$ 0',
         ax=ax,
+        color='tab:orange',
     )
     # The test error will be 0 for all subset sizes >= X.shape[1]
     # b/c the linear model exactly fits the linear data.
     ax.plot([X.shape[1], dataset_loss_no_residuals_in_ideal_fit_df['Subset Size'].max()],
-            [ymin, ymin],
+            [1.1 * ymin, 1.1 * ymin],
             color='tab:orange',
             linestyle='--',
             label='Test = 0')
