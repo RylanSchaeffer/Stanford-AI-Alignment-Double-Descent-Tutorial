@@ -58,7 +58,7 @@ os.makedirs(results_dir, exist_ok=True)
 ablation_type_strs = [
     'Unablated',
     'No Small Singular Values',
-    # 'No Residuals in Ideal Fit',
+    'No Residuals in Ideal Fit',
     # 'Test Datum Features in Training Feature Subspace',
 ]
 
@@ -72,10 +72,12 @@ for dataset_name, dataset_fn in regression_datasets:
     # One ablation will be to make the true underlying relationship linear and noiseless.
     # To do this, we need to know the ideal linear relationship. Unfortunately, we don't have
     # any way to know this in practice, so we'll use all the data as our best guess.
-    ideal_beta = np.linalg.inv(X.T @ X) @ X.T @ y
+    beta_ideal = np.linalg.inv(X.T @ X) @ X.T @ y
 
     dataset_loss_unablated_df = []
     dataset_loss_no_small_singular_values_df = []
+    dataset_loss_no_residuals_in_ideal_fit_df = []
+    dataset_loss_test_datum_features_in_training_feature_subspace_df = []
     for repeat_idx in range(num_repeats):
 
         # subset_sizes = np.arange(10, X_train.shape[0], X_train.shape[0] // 20)
@@ -98,7 +100,6 @@ for dataset_name, dataset_fn in regression_datasets:
             inverted_S = 1. / S
             inverted_S[inverted_S == np.inf] = 0.
             beta_hat = Vt.T @ np.diag(inverted_S) @ U.T @ y_train
-
             y_train_pred = X_train @ beta_hat
             train_mse_unablated = mean_squared_error(y_train, y_train_pred)
             y_test_pred = X_test @ beta_hat
@@ -135,7 +136,29 @@ for dataset_name, dataset_fn in regression_datasets:
             # END: No small singular values.
 
             # BEGIN: No residuals in ideal fit.
+            # Replace the true targets with the ideal possible predictions.
+            y_train_no_residuals = X_train @ beta_ideal
+            y_test_no_residuals = X_test @ beta_ideal
+            beta_hat_no_residuals = Vt.T @ np.diag(inverted_S) @ U.T @ y_train_no_residuals
+            y_train_pred_no_residuals = X_train @ beta_hat_no_residuals
+            train_mse_no_residuals = mean_squared_error(y_train_no_residuals, y_train_pred_no_residuals)
+            y_test_pred_no_residuals = X_test @ beta_hat_no_residuals
+            test_mse_no_residuals = mean_squared_error(y_test_no_residuals, y_test_pred_no_residuals)
+            dataset_loss_no_residuals_in_ideal_fit_df.append({
+                'Dataset': dataset_name,
+                'Subset Size': subset_size,
+                'Train MSE': train_mse_no_residuals,
+                'Test MSE': test_mse_no_residuals,
+                'Repeat Index': repeat_idx,
+            })
             # END: No residuals in ideal fit.
+
+            # # BEGIN: Test datum features in training feature subspace.
+            # y_train_pred = X_train @ beta_hat
+            # train_mse_unablated = mean_squared_error(y_train, y_train_pred)
+            # y_test_pred = X_test @ beta_hat
+            # test_mse_unablated = mean_squared_error(y_test, y_test_pred)
+            # # END: Test datum features in training feature subspace.
 
             # Compute the fraction of the last training datum that lies outside the subspace
             # of the all other training data.
@@ -150,8 +173,11 @@ for dataset_name, dataset_fn in regression_datasets:
 
 
     plt.close()
-    fig, axes = plt.subplots(nrows=1, ncols=4, figsize=(18, 5),
-                             sharex=True, sharey=True)
+    fig, axes = plt.subplots(nrows=1,
+                             ncols=4,
+                             figsize=(20, 5),
+                             sharex=True,
+                             sharey=True)
     fig.suptitle(f'Dataset: {dataset_name}')
     ax = axes[0]
     dataset_loss_unablated_df = pd.DataFrame(dataset_loss_unablated_df)
@@ -191,6 +217,7 @@ for dataset_name, dataset_fn in regression_datasets:
         legend=False,
         ax=ax,
         hue_norm=LogNorm(),
+        palette='OrRd_r',
     )
     sns.lineplot(
         data=dataset_loss_no_small_singular_values_df,
@@ -199,12 +226,39 @@ for dataset_name, dataset_fn in regression_datasets:
         hue='Singular Value Cutoff',
         ax=ax,
         hue_norm=LogNorm(),
+        palette='OrRd_r',
     )
     ax.set_xlabel('Num. Training Samples')
     ax.set_title('No Small Singular Values')
     ax.axvline(x=X.shape[1], color='black', linestyle='--')
     ax.set_yscale('log')
-    # ax.legend()
+
+    ax = axes[2]
+    dataset_loss_no_residuals_in_ideal_fit_df = pd.DataFrame(dataset_loss_no_residuals_in_ideal_fit_df)
+    ax.plot([1, dataset_loss_no_residuals_in_ideal_fit_df['Subset Size'].max()],
+            [ymin, ymin],
+            color='tab:blue',
+            linestyle='--',
+            label='Train = 0')
+    sns.lineplot(
+        data=dataset_loss_no_residuals_in_ideal_fit_df,
+        x='Subset Size',
+        y=f'Test MSE',
+        label='Test',
+        ax=ax,
+    )
+    # The test error will be 0 for all subset sizes >= X.shape[1]
+    # b/c the linear model exactly fits the linear data.
+    ax.plot([X.shape[1], dataset_loss_no_residuals_in_ideal_fit_df['Subset Size'].max()],
+            [ymin, ymin],
+            color='tab:orange',
+            linestyle='--',
+            label='Test = 0')
+    ax.set_xlabel('Num. Training Samples')
+    ax.set_title('No Residuals in Ideal Fit')
+    ax.axvline(x=X.shape[1], color='black', linestyle='--')
+    ax.set_yscale('log')
+    ax.legend()
 
     plt.savefig(os.path.join(results_dir,
                              f'double_descent_dataset={dataset_name}'),
