@@ -59,10 +59,11 @@ ablation_type_strs = [
     'Unablated',
     'No Small Singular Values',
     'No Residuals in Ideal Fit',
-    # 'Test Datum Features in Training Feature Subspace',
+    'Test Datum Features in Training Feature Subspace',
 ]
 
 singular_value_cutoffs = np.logspace(-3, 0, 7)
+num_leading_singular_modes_to_keep = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 num_repeats = 30
 for dataset_name, dataset_fn in regression_datasets:
@@ -77,7 +78,7 @@ for dataset_name, dataset_fn in regression_datasets:
     dataset_loss_unablated_df = []
     dataset_loss_no_small_singular_values_df = []
     dataset_loss_no_residuals_in_ideal_fit_df = []
-    dataset_loss_test_datum_features_in_training_feature_subspace_df = []
+    dataset_loss_test_features_in_training_feature_subspace_df = []
     for repeat_idx in range(num_repeats):
 
         # subset_sizes = np.arange(10, X_train.shape[0], X_train.shape[0] // 20)
@@ -97,12 +98,12 @@ for dataset_name, dataset_fn in regression_datasets:
 
             # BEGIN: Unablated linear fit.
             U, S, Vt = np.linalg.svd(X_train, full_matrices=False, compute_uv=True)
-            inverted_S = 1. / S
-            inverted_S[inverted_S == np.inf] = 0.
-            beta_hat = Vt.T @ np.diag(inverted_S) @ U.T @ y_train
-            y_train_pred = X_train @ beta_hat
+            S_inverted = 1. / S
+            S_inverted[S_inverted == np.inf] = 0.
+            beta_hat_unablated = Vt.T @ np.diag(S_inverted) @ U.T @ y_train
+            y_train_pred = X_train @ beta_hat_unablated
             train_mse_unablated = mean_squared_error(y_train, y_train_pred)
-            y_test_pred = X_test @ beta_hat
+            y_test_pred = X_test @ beta_hat_unablated
             test_mse_unablated = mean_squared_error(y_test, y_test_pred)
             # END: Unablated linear fit.
 
@@ -139,7 +140,7 @@ for dataset_name, dataset_fn in regression_datasets:
             # Replace the true targets with the ideal possible predictions.
             y_train_no_residuals = X_train @ beta_ideal
             y_test_no_residuals = X_test @ beta_ideal
-            beta_hat_no_residuals = Vt.T @ np.diag(inverted_S) @ U.T @ y_train_no_residuals
+            beta_hat_no_residuals = Vt.T @ np.diag(S_inverted) @ U.T @ y_train_no_residuals
             y_train_pred_no_residuals = X_train @ beta_hat_no_residuals
             train_mse_no_residuals = mean_squared_error(y_train_no_residuals, y_train_pred_no_residuals)
             y_test_pred_no_residuals = X_test @ beta_hat_no_residuals
@@ -153,23 +154,30 @@ for dataset_name, dataset_fn in regression_datasets:
             })
             # END: No residuals in ideal fit.
 
-            # # BEGIN: Test datum features in training feature subspace.
-            # y_train_pred = X_train @ beta_hat
-            # train_mse_unablated = mean_squared_error(y_train, y_train_pred)
-            # y_test_pred = X_test @ beta_hat
-            # test_mse_unablated = mean_squared_error(y_test, y_test_pred)
-            # # END: Test datum features in training feature subspace.
-
-            # Compute the fraction of the last training datum that lies outside the subspace
-            # of the all other training data.
-            last_train_datum = X_train[-1, :]
-            other_train_data = X_train[:-1, :]
-            if other_train_data.shape[0] == 0:
-                fraction_outside = 1.
-            else:
-                projection_of_last_train_datum_onto_other_train_data = np.linalg.pinv(other_train_data).T @ last_train_datum @ other_train_data
-                fraction_outside = np.linalg.norm(last_train_datum - projection_of_last_train_datum_onto_other_train_data) / np.linalg.norm(last_train_datum)
-
+            # BEGIN: Project test datum features to training feature subspace.
+            train_mse_test_features_in_training_feature_subspace = train_mse_unablated
+            for num_leading_sing_modes in num_leading_singular_modes_to_keep:
+                # Shape: (num features, num leading singular modes)
+                X_train_leading = U[:, :num_leading_sing_modes] @ np.diag(S[:num_leading_sing_modes]) @ Vt[:num_leading_sing_modes, :]
+                X_train_pinv_leading = np.linalg.pinv(X_train_leading)
+                projection_matrix = np.matmul(X_train_leading.T, X_train_pinv_leading.T)
+                X_test_projected_onto_leading_X_train_modes = X_test @ projection_matrix.T
+                fraction_inside = np.linalg.norm(X_test_projected_onto_leading_X_train_modes, axis=1) / np.linalg.norm(X_test, axis=1)
+                assert np.all(np.logical_and(fraction_inside >= -0.001, fraction_inside <= 1.001))  # Floating point errors can result in slight oversteps
+                y_test_pred_projected_onto_leading_train_modes = X_test_projected_onto_leading_X_train_modes @ beta_hat_unablated
+                test_mse_test_features_in_training_feature_subspace = mean_squared_error(
+                    y_test,
+                    y_test_pred_projected_onto_leading_train_modes,
+                )
+                dataset_loss_test_features_in_training_feature_subspace_df.append({
+                    'Dataset': dataset_name,
+                    'Subset Size': subset_size,
+                    'Train MSE': train_mse_test_features_in_training_feature_subspace,
+                    'Test MSE': test_mse_test_features_in_training_feature_subspace,
+                    'Repeat Index': repeat_idx,
+                    'Num. Leading Singular Modes to Keep': num_leading_sing_modes,
+                })
+            # END: Test datum features in training feature subspace.
 
     plt.close()
     fig, axes = plt.subplots(nrows=1,
@@ -211,7 +219,7 @@ for dataset_name, dataset_fn in regression_datasets:
     sns.lineplot(
         data=dataset_loss_no_small_singular_values_df,
         x='Subset Size',
-        y=f'Train MSE',
+        y='Train MSE',
         hue='Singular Value Cutoff',
         legend=False,
         ax=ax,
@@ -233,6 +241,31 @@ for dataset_name, dataset_fn in regression_datasets:
     ax.set_yscale('log')
 
     ax = axes[2]
+    dataset_loss_test_features_in_training_feature_subspace_df = pd.DataFrame(
+        dataset_loss_test_features_in_training_feature_subspace_df)
+    sns.lineplot(
+        data=dataset_loss_test_features_in_training_feature_subspace_df,
+        x='Subset Size',
+        y='Train MSE',
+        hue='Num. Leading Singular Modes to Keep',
+        legend=False,
+        ax=ax,
+        palette='PuBu',
+    )
+    sns.lineplot(
+        data=dataset_loss_test_features_in_training_feature_subspace_df,
+        x='Subset Size',
+        y=f'Test MSE',
+        hue='Num. Leading Singular Modes to Keep',
+        ax=ax,
+        palette='OrRd',
+    )
+    ax.set_xlabel('Num. Training Samples')
+    ax.set_title('Test Features in Training Feature Subspace')
+    ax.axvline(x=X.shape[1], color='black', linestyle='--')
+    ax.set_yscale('log')
+
+    ax = axes[3]
     dataset_loss_no_residuals_in_ideal_fit_df = pd.DataFrame(dataset_loss_no_residuals_in_ideal_fit_df)
     ax.plot([1, dataset_loss_no_residuals_in_ideal_fit_df['Subset Size'].max()],
             [1.1 * ymin, 1.1 * ymin],
@@ -260,7 +293,7 @@ for dataset_name, dataset_fn in regression_datasets:
     ax.legend()
 
     plt.savefig(os.path.join(results_dir,
-                             f'double_descent_dataset={dataset_name}'),
+                             f'double_descent_ablations_dataset={dataset_name}'),
                 bbox_inches='tight',
                 dpi=300)
     plt.show()
