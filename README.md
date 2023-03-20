@@ -1,11 +1,9 @@
-# An Introductory Tutorial on Double Descent
-## What Double Descent Is and Why It Occurs
-
-Authors: Rylan Schaeffer, etc.
+# What Double Descent Is and Why It Occurs:
+## An Intuitive, Interpretable Understanding with Causal Ablations
 
 This repository contains the code and data for our preprint 
-"An Introductory Tutorial on Double Descent: What Double Descent Is and Why It Occurs".
-The tutorial will be available on arXiv (and LessWrong?).
+"What Double Descent Is and Why It Occurs: An Intuitive, Interpretable Understanding with Causal Ablations".
+The tutorial will be available on arXiv (and SAIL Blog and LessWrong?).
 
 [Overleaf Draft](https://www.overleaf.com/read/xscfwstjdqwy)
 
@@ -59,3 +57,7 @@ Removing small singular values in the training features $$X$$ prevents double de
 Preventing the test features $$\vec{x}_{test}$$ from varying in the trailing singular modes of the training features $$X$$
 prevents double descent. Ensuring that the optimal model in the model class has zero residual
 prediction errors $$E$$ prevents double descent.
+
+## Attribution
+
+Authors: Rylan Schaeffer, Mikail Khona, Zachary Robertson, Akhilan Boopathy, Kateryna Pistunova, Ila Rani Fiete, Sanmi Koyejo.
