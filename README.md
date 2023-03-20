@@ -22,8 +22,9 @@ The tutorial will be available on arXiv (and SAIL Blog and LessWrong?).
 
 ## Mathematical Explanation in Ordinary Linear Regression
 
-Let $X \in \mathbb{R}^{N \times D}, Y \in \mathbb{R}^{N \times 1}$ denote our training data features and targets, respectively.
-Let $X := U S V^T$ denote the singular value decomposition of $X$ with rank $R$, and let $E = Y - X \beta^*$ denote the
+Let $X \in \mathbb{R}^{N \times D}, Y \in \mathbb{R}^{N \times 1}$ denote our training data features and targets, respectively, and
+let $\vec{x}_{\text} \in \mathbb{R}^D$ be a new test datum features.
+Let $X := U S V^T$ denote the singular value decomposition of $X$ with rank $R$, $E = Y - X \beta^*$ denote the
 residuals of the best possible model in the model class (i.e. insurmountable "errors" from the "perspective" of the model class).
 _The below equation is critical_. It reveals that our test prediction error (and thus, our test squared error!) will
 depend on an interaction between 3 quantities:
