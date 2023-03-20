@@ -28,19 +28,19 @@ _The below equation is critical_. It reveals that our test prediction error (and
 depend on an interaction between 3 quantities:
 
 
-$$\sum_{r=1}^R  \frac{1}{\sigma_r} (\Vec{x}_{test} \cdot \vec{v}_r) (\vec{u}_r \cdot E)$$
+$$\sum_{r=1}^R  \frac{1}{\sigma_r} (\vec{x}_{test} \cdot \vec{v}_r) (\vec{u}_r \cdot E)$$
 
-1. How much the training features $$X$$ vary in each direction; more formally, the inverted (non-zero) singular values of the _training features_ $$X$$:
+1. How much the training features $X$ vary in each direction; more formally, the inverted (non-zero) singular values of the _training features_ $X$:
 
 $$\frac{1}{\sigma_r}$$
     
-2. How much, and in which directions, the _test features_ $$\vec{x}_{test}$$ vary relative to the __training features__ $$X$$; more formally: how $$\vec{x}_{test}$$ projects onto $$X$$'s right singular vectors $$V$$:
+2. How much, and in which directions, the _test features_ $\vec{x}_{test}$ vary relative to the __training features__ $X$; more formally: how $\vec{x}_{test}$ projects onto $X$'s right singular vectors $V$:
     
-    $$\Vec{x}_{test} \cdot \Vec{v}_r$$
+    $$\vec{x}_{test} \cdot \vec{v}_r$$
     
-3. How well the _best possible model in the model class_ can correlate the variance in the __training features $$X$$ with the __training regression targets__ $$Y$$; more formally: how the residuals $$E$$ of the best possible model in the model class (i.e. insurmountable "errors" from the "perspective" of the model class) project onto $$X$$'s left singular vectors $$U$$:
+3. How well the _best possible model in the model class_ can correlate the variance in the __training features $X$ with the __training regression targets__ $Y$; more formally: how the residuals $E$ of the best possible model in the model class (i.e. insurmountable "errors" from the "perspective" of the model class) project onto $X$'s left singular vectors $U$:
     
-    $$\Vec{u}_r \cdot E$$
+    $$\vec{u}_r \cdot E$$
    
 ## Causal Ablations on Real Data
 
