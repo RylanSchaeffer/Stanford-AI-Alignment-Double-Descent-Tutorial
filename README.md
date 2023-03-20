@@ -22,3 +22,11 @@ The tutorial will be available on arXiv (and LessWrong?).
   <img align="top" src="results/real_data/least_informative_singular_value_dataset=WHO%20Life%20Expectancy.png" width="48%" />
 </p>
 
+## Causal Ablations 
+
+<p align="middle">
+  <img align="top" src="results/real_data_ablations/double_descent_ablations_dataset=California%20Housing.png" width="99%" />
+  <img align="top" src="results/real_data_ablations/double_descent_ablations_dataset=Diabetes.png" width="99%" />
+  <img align="top" src="results/real_data_ablations/double_descent_ablations_dataset=WHO%20Life%20Expectancy.png" width="99%" />
+</p>
+
