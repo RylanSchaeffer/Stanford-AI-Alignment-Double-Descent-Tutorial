@@ -24,9 +24,11 @@ The tutorial will be available on arXiv (and LessWrong?).
 
 ## Mathematical Explanation in Ordinary Linear Regression
 
+Let $X \in \mathbb{R}^{N \times D}, Y \int \mathbb{R}^{N \times 1}$ denote our training data features and targets, respectively.
+Let $X := U S V^T$ denote the singular value decomposition of $X$ with rank $R$, and let $E = Y - X \beta^*$ denote the
+residuals of the best possible model in the model class (i.e. insurmountable "errors" from the "perspective" of the model class).
 _The below equation is critical_. It reveals that our test prediction error (and thus, our test squared error!) will
 depend on an interaction between 3 quantities:
-
 
 $$\sum_{r=1}^R  \frac{1}{\sigma_r} (\vec{x}_{test} \cdot \vec{v}_r) (\vec{u}_r \cdot E)$$
 
@@ -34,11 +36,11 @@ $$\sum_{r=1}^R  \frac{1}{\sigma_r} (\vec{x}_{test} \cdot \vec{v}_r) (\vec{u}_r \
 
 $$\frac{1}{\sigma_r}$$
     
-2. How much, and in which directions, the _test features_ $\vec{x}_{test}$ vary relative to the __training features__ $X$; more formally: how $\vec{x}_{test}$ projects onto $X$'s right singular vectors $V$:
+2. How much, and in which directions, the _test features_ $\vec{x}_{test}$ vary relative to the _training features_ $X$; more formally: how $\vec{x}_{test}$ projects onto $X$'s right singular vectors $V$:
     
     $$\vec{x}_{test} \cdot \vec{v}_r$$
     
-3. How well the _best possible model in the model class_ can correlate the variance in the __training features $X$ with the __training regression targets__ $Y$; more formally: how the residuals $E$ of the best possible model in the model class (i.e. insurmountable "errors" from the "perspective" of the model class) project onto $X$'s left singular vectors $U$:
+3. How well the _best possible model in the model class_ can correlate the variance in the _training features_ $X$ with the _training regression targets_ $Y$; more formally: how the residuals $E$ of the best possible model project onto $X$'s left singular vectors $U$:
     
     $$\vec{u}_r \cdot E$$
    
