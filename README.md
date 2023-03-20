@@ -34,7 +34,7 @@ $$\sum_{r=1}^R  \frac{1}{\sigma_r} (\vec{x}_{test} \cdot \vec{v}_r) (\vec{u}_r \
 
 $$\frac{1}{\sigma_r}$$
     
-2. How much, and in which directions, the test features $\vec{x}_{test}$ vary relative to the training features $X$; more formally: how $\vec{x}_{test}$ projects onto $X$'s right singular vectors $V$:
+2. How much, and in which directions, the test features vary relative to the training features $X$; more formally: how $\vec{x}_{test}$ projects onto $X$'s right singular vectors $V$:
     
     $$\vec{x}_{test} \cdot \vec{v}_r$$
     
