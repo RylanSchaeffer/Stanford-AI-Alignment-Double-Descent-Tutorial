@@ -115,6 +115,8 @@ for num_data in num_data_list:
     # Reverse y axis so all positive directions face the "camera".
     ax.invert_yaxis()
 
+    ax.set_title('Num Data: {}'.format(num_data))
+
     plt.tight_layout()
     plt.savefig(os.path.join(results_dir,
                              f'data_distribution_num_data={num_data}'),
