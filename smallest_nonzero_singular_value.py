@@ -44,9 +44,13 @@ ax = fig.add_subplot(111, projection='3d')
 ax.scatter(X[:, 0], X[:, 1], X[:, 2], s=1, color='k')
 # Add eigenvectors
 eigvals, eigvecs = np.linalg.eigh(cov)
+eigvecs = eigvecs[:, np.argsort(eigvals)]
+eigvals = np.sort(eigvals)
 print('True Covariance Eigenvalues: ', eigvals)
 print('Empirical Covariance Eigenvalues: ', np.sort(np.linalg.eigvals(np.cov(X.T))))
 for eigidx, (eigval, eigvec) in enumerate(zip(eigvals, eigvecs.T)):
+    if np.dot(eigvec, np.ones(dim)) < 0.:
+        eigvec = -eigvec
     scaled_eigvec = eigval * eigvec
     drawvec = Arrow3D([0, scaled_eigvec[0]], [0, scaled_eigvec[1]], [0, scaled_eigvec[2]],
                       mutation_scale=20, lw=2, arrowstyle="-|>", color=eigindex_color_map[eigidx])
@@ -89,10 +93,12 @@ for num_data in num_data_list:
     # Add eigenvectors
     U, S, Vt = np.linalg.svd(X_subset / np.sqrt(num_data), full_matrices=False)
     eigvals, eigvecs = np.square(S), Vt
-    print(np.sort(eigvals))
+    eigvecs = eigvecs[np.argsort(eigvals)]
+    eigvals = np.sort(eigvals)
+    print(eigvals)
     for eigidx, (eigval, eigvec) in enumerate(zip(eigvals, eigvecs)):
-        # if np.dot(eigvec, np.ones(dim)) < 0.:
-        #     eigvec = -eigvec
+        if np.dot(eigvec, np.ones(dim)) < 0.:
+            eigvec = -eigvec
         scaled_eigvec = eigval * eigvec
         drawvec = Arrow3D([0, scaled_eigvec[0]], [0, scaled_eigvec[1]], [0, scaled_eigvec[2]],
                           mutation_scale=20, lw=2, arrowstyle="-|>", color=eigindex_color_map[eigidx])
