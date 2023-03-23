@@ -23,7 +23,8 @@ os.makedirs(results_dir, exist_ok=True)
 num_data = 1500
 dim = 3
 mean = np.zeros(dim)
-cov = np.array([[23., 9., 4.], [9., 6., 1.0], [4., 1., 5.]])
+cov = np.array([[23., 9., 4.], [9., 6., 2.0], [4., 2.0, 5.]])
+assert np.all(np.linalg.eigvals(cov) > 0.)
 # Shape: (1000, 3)
 X = np.random.multivariate_normal(
     mean=mean,
@@ -40,9 +41,6 @@ ax.scatter(X[:, 0], X[:, 1], X[:, 2], s=1)
 eigvals, eigvecs = np.linalg.eigh(cov)
 print('Eigenvalues: ', eigvals)
 for eigval, eigvec in zip(eigvals, eigvecs.T):
-    # We want our eigenvectors to "face" the camera.
-    if np.dot(eigvec, np.ones(dim)) < 0:
-        eigvec *= -1
     scaled_eigvec = eigval * eigvec
     drawvec = Arrow3D([0, scaled_eigvec[0]], [0, scaled_eigvec[1]], [0, scaled_eigvec[2]],
                       mutation_scale=20, lw=2, arrowstyle="-|>", color='r')
@@ -79,9 +77,6 @@ for num_data in num_data_list:
     U, S, Vt = np.linalg.svd(X_subset, full_matrices=False)
     print(S)
     for eigval, eigvec in zip(np.square(S), Vt):
-        # We want our eigenvectors to "face" the camera.
-        if np.dot(eigvec, np.ones(dim)) < 0:
-            eigvec *= -1
         scaled_eigvec = eigval * eigvec
         drawvec = Arrow3D([0, scaled_eigvec[0]], [0, scaled_eigvec[1]], [0, scaled_eigvec[2]],
                           mutation_scale=20, lw=2, arrowstyle="-|>", color='r')
