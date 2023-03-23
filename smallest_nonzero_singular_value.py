@@ -31,23 +31,29 @@ X = np.random.multivariate_normal(
     cov=cov,
     size=num_data,
 )
-cov2 = np.cov(X, rowvar=False)
+
+eigindex_color_map = {
+    0: 'r',
+    1: 'g',
+    2: 'b',
+}
 
 # Plot X in 3D.
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-ax.scatter(X[:, 0], X[:, 1], X[:, 2], s=1)
+ax.scatter(X[:, 0], X[:, 1], X[:, 2], s=1, color='k')
 # Add eigenvectors
 eigvals, eigvecs = np.linalg.eigh(cov)
-print('Eigenvalues: ', eigvals)
-for eigval, eigvec in zip(eigvals, eigvecs.T):
+print('True Covariance Eigenvalues: ', eigvals)
+print('Empirical Covariance Eigenvalues: ', np.sort(np.linalg.eigvals(np.cov(X.T))))
+for eigidx, (eigval, eigvec) in enumerate(zip(eigvals, eigvecs.T)):
     scaled_eigvec = eigval * eigvec
     drawvec = Arrow3D([0, scaled_eigvec[0]], [0, scaled_eigvec[1]], [0, scaled_eigvec[2]],
-                      mutation_scale=20, lw=2, arrowstyle="-|>", color='r')
+                      mutation_scale=20, lw=2, arrowstyle="-|>", color=eigindex_color_map[eigidx])
     # adding the arrow to the plot
     ax.add_artist(drawvec)
 # Set axes limits.
-max_val = 7
+max_val = 7.
 ax.set_xlim3d([-max_val, max_val])
 ax.set_ylim3d([-max_val, max_val])
 ax.set_zlim3d([-max_val, max_val])
@@ -67,29 +73,33 @@ plt.show()
 
 
 
-num_data_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15]
+num_data_list = [1, 2, 3, 4, 5, 10, 25, 100, 500, len(X)]
 for num_data in num_data_list:
     plt.close()
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     X_subset = X[:num_data, :]
-    # Add eigenvectors
-    U, S, Vt = np.linalg.svd(X_subset, full_matrices=False)
-    print(S)
-    for eigval, eigvec in zip(np.square(S), Vt):
-        scaled_eigvec = eigval * eigvec
-        drawvec = Arrow3D([0, scaled_eigvec[0]], [0, scaled_eigvec[1]], [0, scaled_eigvec[2]],
-                          mutation_scale=20, lw=2, arrowstyle="-|>", color='r')
-        # adding the arrow to the plot
-        ax.add_artist(drawvec)
 
     ax.scatter(X_subset[:num_data, 0],
                X_subset[:num_data, 1],
                X_subset[:num_data, 2],
-               s=50)
+               s=50,
+               color='k')
+
+    # Add eigenvectors
+    U, S, Vt = np.linalg.svd(X_subset / np.sqrt(num_data), full_matrices=False)
+    eigvals, eigvecs = np.square(S), Vt
+    print(np.sort(eigvals))
+    for eigidx, (eigval, eigvec) in enumerate(zip(eigvals, eigvecs)):
+        # if np.dot(eigvec, np.ones(dim)) < 0.:
+        #     eigvec = -eigvec
+        scaled_eigvec = eigval * eigvec
+        drawvec = Arrow3D([0, scaled_eigvec[0]], [0, scaled_eigvec[1]], [0, scaled_eigvec[2]],
+                          mutation_scale=20, lw=2, arrowstyle="-|>", color=eigindex_color_map[eigidx])
+        # adding the arrow to the plot
+        ax.add_artist(drawvec)
 
     # Set axes limits.
-    max_val = 7
     ax.set_xlim3d([-max_val, max_val])
     ax.set_ylim3d([-max_val, max_val])
     ax.set_zlim3d([-max_val, max_val])
