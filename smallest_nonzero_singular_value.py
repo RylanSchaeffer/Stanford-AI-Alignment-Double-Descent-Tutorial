@@ -49,13 +49,16 @@ eigvals = np.sort(eigvals)
 print('True Covariance Eigenvalues: ', eigvals)
 print('Empirical Covariance Eigenvalues: ', np.sort(np.linalg.eigvals(np.cov(X.T))))
 for eigidx, (eigval, eigvec) in enumerate(zip(eigvals, eigvecs.T)):
-    if np.dot(eigvec, np.ones(dim)) < 0.:
-        eigvec = -eigvec
     scaled_eigvec = eigval * eigvec
-    drawvec = Arrow3D([0, scaled_eigvec[0]], [0, scaled_eigvec[1]], [0, scaled_eigvec[2]],
-                      mutation_scale=20, lw=2, arrowstyle="-|>", color=eigindex_color_map[eigidx])
-    # adding the arrow to the plot
-    ax.add_artist(drawvec)
+    prefactors = [-1., 1.]
+    for prefactor in prefactors:
+        drawvec = Arrow3D([0, prefactor * scaled_eigvec[0]],
+                          [0, prefactor * scaled_eigvec[1]],
+                          [0, prefactor * scaled_eigvec[2]],
+                          mutation_scale=20, lw=2, arrowstyle="-|>", color=eigindex_color_map[2 - eigidx])
+        # adding the arrow to the plot
+        ax.add_artist(drawvec)
+
 # Set axes limits.
 max_val = 7.
 ax.set_xlim3d([-max_val, max_val])
@@ -67,6 +70,8 @@ ax.set_zlabel("Dim 3")
 # Reverse y axis so all positive directions face the "camera".
 ax.invert_yaxis()
 
+ax.set_title('True Data Distribution')
+
 plt.savefig(os.path.join(results_dir,
                          f'data_distribution'),
             bbox_inches='tight',
@@ -77,7 +82,7 @@ plt.show()
 
 
 
-num_data_list = [1, 2, 3, 4, 5, 10, 25, 100, 500, len(X)]
+num_data_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 25, 100]
 for num_data in num_data_list:
     plt.close()
     fig = plt.figure()
@@ -93,17 +98,19 @@ for num_data in num_data_list:
     # Add eigenvectors
     U, S, Vt = np.linalg.svd(X_subset / np.sqrt(num_data), full_matrices=False)
     eigvals, eigvecs = np.square(S), Vt
-    eigvecs = eigvecs[np.argsort(eigvals)]
-    eigvals = np.sort(eigvals)
+    eigvecs = eigvecs[np.argsort(eigvals)[::-1]]
+    eigvals = np.sort(eigvals)[::-1]
     print(eigvals)
     for eigidx, (eigval, eigvec) in enumerate(zip(eigvals, eigvecs)):
-        if np.dot(eigvec, np.ones(dim)) < 0.:
-            eigvec = -eigvec
         scaled_eigvec = eigval * eigvec
-        drawvec = Arrow3D([0, scaled_eigvec[0]], [0, scaled_eigvec[1]], [0, scaled_eigvec[2]],
-                          mutation_scale=20, lw=2, arrowstyle="-|>", color=eigindex_color_map[eigidx])
-        # adding the arrow to the plot
-        ax.add_artist(drawvec)
+        prefactors = [-1., 1.]
+        for prefactor in prefactors:
+            drawvec = Arrow3D([0, prefactor * scaled_eigvec[0]],
+                              [0, prefactor * scaled_eigvec[1]],
+                              [0, prefactor * scaled_eigvec[2]],
+                              mutation_scale=20, lw=2, arrowstyle="-|>", color=eigindex_color_map[2-eigidx])
+            # adding the arrow to the plot
+            ax.add_artist(drawvec)
 
     # Set axes limits.
     ax.set_xlim3d([-max_val, max_val])
