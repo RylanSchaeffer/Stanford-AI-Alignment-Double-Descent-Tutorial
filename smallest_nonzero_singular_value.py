@@ -55,7 +55,7 @@ for eigidx, (eigval, eigvec) in enumerate(zip(eigvals, eigvecs.T)):
         drawvec = Arrow3D([0, prefactor * scaled_eigvec[0]],
                           [0, prefactor * scaled_eigvec[1]],
                           [0, prefactor * scaled_eigvec[2]],
-                          mutation_scale=20, lw=2, arrowstyle="-|>", color=eigindex_color_map[2 - eigidx])
+                          mutation_scale=20, lw=2, arrowstyle="-|>", color=eigindex_color_map[eigidx])
         # adding the arrow to the plot
         ax.add_artist(drawvec)
 
