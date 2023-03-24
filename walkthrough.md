@@ -47,7 +47,7 @@ the two parameterization regimes.
 **Underparameterized**: we estimate the linear relationship between the covariates $\vec{x}_n$
 and the target $y_n$ by solving the classical least-squares minimization problem:
 
-$$\hat{\vec{\beta}}_{under} := \arg \min_{\vec{\beta}} \frac{1}{N} \sum_n ||\vec{x}_n \cdot \vec{\beta} - y_n||_2^2 \, = \, \arg \min_{\vec{\beta}} ||X \vec{\beta} - Y ||_F^2$$
+$$\hat{\vec{\beta}}_{under} := \arg \min_{\vec{\beta}} \frac{1}{N} \sum_n ||\vec{x}_n \cdot \vec{\beta} - y_n||_2^2  =  \arg \min_{\vec{\beta}} ||X \vec{\beta} - Y ||_F^2$$
 
 The solution to this underparameterized optimization problem is the well-known ordinary least squares estimator that uses the second moment matrix $X^T X$:
 
@@ -56,7 +56,7 @@ $$\hat{\vec{\beta}}_{under} = (X^T X)^{-1} X^T Y$$
 **Overparameterized**: the above optimization problem is ill-posed since there are infinitely many solutions;
 this is because we have fewer constraints than parameters. Consequently, we need to choose a different (constrained) optimization problem:
 
-$$\hat{\vec{\beta}}_{over}  :=  \arg \min_{\vec{\beta}} ||\vec{\beta}||_2^2 \quad \quad \text{s.t.} \quad \quad \forall \, n \in \{1, ..., N\} \quad \vec{x}_n \cdot \vec{\beta} = y_n$$
+$$\hat{\vec{\beta}}_{over}  :=  \arg \min_{\vec{\beta}} ||\vec{\beta}||_2^2 \quad \quad \text{s.t.} \quad \quad \forall  n \in \{1, ..., N\} \quad \vec{x}_n \cdot \vec{\beta} = y_n$$
 
 One way to see why the Gram matrix appears is via constrained optimization. Define the Lagrangian with Lagrange multipliers $\vec{\lambda} \in \mathbb{R}^N$:
 
@@ -65,8 +65,8 @@ $$\mathcal{L}(\vec{\beta}, \vec{\lambda}) := ||\vec{\beta}||_2^2 + \vec{\lambda}
 Differentiating with respect to both the parameters and the Lagrange multipliers yields:
 
 $$\begin{align*}
-    \nabla_{\vec{\beta}}\,  \mathcal{L}(\vec{\beta}, \vec{\lambda}) = \vec{0} = 2\hat{\vec{\beta}} - X^T \vec{\lambda} &\Rightarrow \hat{\vec{\beta}}_{over} = \frac{1}{2} X^T \vec{\lambda}\\
-    \nabla_{\vec{\lambda}} \,\mathcal{L}(\beta, \lambda) = \vec{0} = Y - X \hat{\vec{\beta}}_{over} &\Rightarrow Y = \frac{1}{2} X X^T \vec{\lambda}\\
+    \nabla_{\vec{\beta}}  \mathcal{L}(\vec{\beta}, \vec{\lambda}) = \vec{0} = 2\hat{\vec{\beta}} - X^T \vec{\lambda} &\Rightarrow \hat{\vec{\beta}}_{over} = \frac{1}{2} X^T \vec{\lambda}\\
+    \nabla_{\vec{\lambda}} \mathcal{L}(\beta, \lambda) = \vec{0} = Y - X \hat{\vec{\beta}}_{over} &\Rightarrow Y = \frac{1}{2} X X^T \vec{\lambda}\\
     &\Rightarrow \vec{\lambda} = 2 (X X^T)^{-1} Y\\
     &\Rightarrow \hat{\vec{\beta}}_{over} = X^T (X X^T)^{-1} Y
 \end{align*}$$
@@ -102,7 +102,7 @@ $$\begin{align*}
     \hat{y}_{test,under} &= \Vec{x}_{test} \cdot (X^T X)^{-1} X^T Y\\
     &= \Vec{x}_{test} \cdot (X^T X)^{-1} X^T (X \beta^* + E)\\
     &= \Vec{x}_{test} \cdot (X^T X)^{-1} X^T X \beta^* + \vec{x}_{test} \cdot (X^T X)^{-1} X^T E\\
-    &= \underbrace{\Vec{x}_{test} \cdot \beta^*}_{:= y_{test}^*} + \, \vec{x}_{test} \cdot (X^T X)^{-1} X^T E\\
+    &= \underbrace{\Vec{x}_{test} \cdot \beta^*}_{:= y_{test}^*} +  \vec{x}_{test} \cdot (X^T X)^{-1} X^T E\\
     \hat{y}_{test,under} - y_{test}^* &= \vec{x}_{test} \cdot (X^T X)^{-1} X^T E
     % \hat{y}_{test,over} &= \underbrace{\vec{x}_{test} \cdot \vec{\beta}^*}_{:= y_{test}^*} \quad + \quad \Vec{x}_{test} \cdot \underbrace{X^T (X X^T)^{-1}}_{:= X^+} E
 \end{align*}$$
@@ -110,10 +110,10 @@ $$\begin{align*}
 This equation is important, but opaque. To extract the intuition, we will replace $X$ with its [Singular Value Decomposition](https://en.wikipedia.org/wiki/Singular_value_decomposition)
 $X = U \Sigma V^T$ to reveal how different quantities interact. 
 Let $R := rank(X)$ and let $\sigma_1 > \sigma_2 > ... > \sigma_R > 0$ be $X$'s (non-zero) singular values.
-Recalling $E \in \mathbb{R}^{N \times 1}$, we can decompose the (underparameterized) prediction error
-$\hat{y}_{test, under} - y_{test}^*$ along the orthogonal singular modes:
+Recalling $E \in \mathbb{R}^{N \times 1}$, we can decompose the (underparameterized) prediction error $\hat{y}_{test, under}
+- y_{test}^*$ along the orthogonal singular modes:
 
-$$\hat{y}_{test, under} - y_{test}^* &= \Vec{x}_{test} \cdot V \Sigma^{+} U^T E = \sum_{r=1}^R  \frac{1}{\sigma_r} (\Vec{x}_{test} \cdot \vec{v}_r) (\vec{u}_r \cdot E)$$
+$$\hat{y}_{test, under} - y_{test}^* = \Vec{x}_{test} \cdot V \Sigma^{+} U^T E = \sum_{r=1}^R  \frac{1}{\sigma_r} (\Vec{x}_{test} \cdot \vec{v}_r) (\vec{u}_r \cdot E)$$
 
 In the overparameterized regime, our calculations change slightly:
 
@@ -144,7 +144,7 @@ $\vec{\beta}^*$ to be lost, which in turn increases the overparameterized predic
 Statisticians call this term $\vec{x}_{test} \cdot (X^T (X X^T)^{-1} X - I_D) \beta^*$ the "bias". 
 The other term (the ``variance") is what causes double descent:
 
-$$\sum_{r=1}^R  \frac{1}{\sigma_r} (\Vec{x}_{test} \cdot \vec{v}_r) (\vec{u}_r \cdot E)$$
+$$\sum_{r=1}^R  \frac{1}{\sigma_r} (\vec{x}_{test} \cdot \vec{v}_r) (\vec{u}_r \cdot E)$$
 
 **This equation is critical.** It reveals that our test prediction error (and thus, our test squared error!)
 will depend on an interaction between 3 quantities:
@@ -156,9 +156,9 @@ $$\frac{1}{\sigma_r}$$
 
 2. How much, and in which directions, the _test features_ $\vec{x}_{test}$ vary relative to the _training features_ $X$; more formally: how $\vec{x}_{test}$ projects onto $X$'s right singular vectors $V$:
 %
-$$\Vec{x}_{test} \cdot \Vec{v}_r$$
+$$\vec{x}_{test} \cdot \vec{v}_r$$
 
 3. How well the _best possible model in the model class_ can correlate the variance in the _training features_ $X$ with the _training regression targets_ $Y$; more formally: how the residuals $E$ of the best possible model in the model class (i.e. insurmountable "errors" from the "perspective" of the model class) project onto $X$'s left singular vectors $U$:
 %
-$$\Vec{u}_r \cdot E$$
+$$\vec{u}_r \cdot E$$
     
