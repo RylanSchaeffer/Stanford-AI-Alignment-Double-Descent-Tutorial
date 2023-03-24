@@ -44,7 +44,7 @@ to number of data $N$, varying the number of data is as valid an approach as var
 To understand where and why double descent occurs in linear regression, we'll study how linear regression behaves in 
 the two parameterization regimes. 
 
-If the regression is _underparameterized_, we estimate the linear relationship between the covariates $\vec{x}_n$
+**Underparameterized**: we estimate the linear relationship between the covariates $\vec{x}_n$
 and the target $y_n$ by solving the classical least-squares minimization problem:
 
 $$\hat{\vec{\beta}}_{under} := \arg \min_{\vec{\beta}} \frac{1}{N} \sum_n ||\vec{x}_n \cdot \vec{\beta} - y_n||_2^2 \, = \, \arg \min_{\vec{\beta}} ||X \vec{\beta} - Y ||_F^2$$
@@ -53,7 +53,7 @@ The solution to this underparameterized optimization problem is the well-known o
 
 $$\hat{\vec{\beta}}_{under} = (X^T X)^{-1} X^T Y$$
 
-If the model is _overparameterized_, the above optimization problem is ill-posed since there are infinitely many solutions;
+**Overparameterized**: the above optimization problem is ill-posed since there are infinitely many solutions;
 this is because we have fewer constraints than parameters. Consequently, we need to choose a different (constrained) optimization problem:
 
 $$\hat{\vec{\beta}}_{over}  :=  \arg \min_{\vec{\beta}} ||\vec{\beta}||_2^2 \quad \quad \text{s.t.} \quad \quad \forall \, n \in \{1, ..., N\} \quad \vec{x}_n \cdot \vec{\beta} = y_n$$
@@ -72,15 +72,15 @@ $$\begin{align*}
 \end{align*}$$
 
 Here, we are able to invert the Gram matrix because it is full rank in the overparametrized regime.
-After fitting its parameters, the model will make the following predictions for given test point $\vec{x}_{test}$:
-%
-\begin{align*}
+After fitting its parameters, the model will make the following predictions for a given test point $\vec{x}_{test}$:
+
+$$\begin{align*}
     \hat{y}_{test, under} &= \vec{x}_{test} \cdot \hat{\Vec{\beta}}_{under} = \vec{x}_{test} \cdot (X^T X)^{-1} X^T Y\\
     \hat{y}_{test, over} &= \vec{x}_{test} \cdot \hat{\Vec{\beta}}_{over} 
     = \vec{x}_{test} \cdot X^T (X X^T)^{-1} Y
-\end{align*}
+\end{align*}$$
 
-\textit{Hidden in the above equations is an interaction between three quantities that can, when all grow extreme, create double descent.} 
+**Hidden in the above equations is an interaction between three quantities that can, when all grow extreme, create double descent.** 
 To reveal the three quantities, we'll rewrite the regression targets by introducing a slightly more detailed notation.
 Unknown to us, there are some ideal linear parameters $\vec{\beta}^* \in \mathbb{R}^P = \mathbb{R}^D$ that truly
 minimize the test mean squared error. We can write any regression target as the inner product of the data $\vec{x}_n$ 
@@ -107,7 +107,7 @@ $$\begin{align*}
     % \hat{y}_{test,over} &= \underbrace{\vec{x}_{test} \cdot \vec{\beta}^*}_{:= y_{test}^*} \quad + \quad \Vec{x}_{test} \cdot \underbrace{X^T (X X^T)^{-1}}_{:= X^+} E
 \end{align*}$$
 
-This equation is important, but opaque. To extract the intuition, we will replace $X$ with its [Singular Valule Decomposition](https://en.wikipedia.org/wiki/Singular_value_decomposition)
+This equation is important, but opaque. To extract the intuition, we will replace $X$ with its [Singular Value Decomposition](https://en.wikipedia.org/wiki/Singular_value_decomposition)
 $X = U \Sigma V^T$ to reveal how different quantities interact. 
 Let $R := rank(X)$ and let $\sigma_1 > \sigma_2 > ... > \sigma_R > 0$ be $X$'s (non-zero) singular values.
 Recalling $E \in \mathbb{R}^{N \times 1}$, we can decompose the (underparameterized) prediction error
