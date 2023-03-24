@@ -139,7 +139,7 @@ correlate with fluctuations in the targets $y$. In the overparameterized regime,
 are data. Consequently, for $N$ data points in $D=P$ dimensions, the model can "see" fluctuations in at most $N$ dimensions,
 but cannot "see" fluctuations in the remaining $P-N$ dimensions. This causes information about the optimal linear relationship
 $\vec{\beta}^*$ to be lost, which in turn increases the overparameterized prediction error $\hat{y}_{test, over} - y_{test}^*$.
-Statisticians call this term $\vec{x}_{test} \cdot (X^T (X X^T)^{-1} X - I_D) \beta^*$ the "bias". 
+Statisticians call this term $\vec{x}\_{test} \cdot (X^T (X X^T)^{-1} X - I_D) \beta^*$ the "bias". 
 The other term (the ``variance") is what causes double descent:
 
 $$\sum_{r=1}^R  \frac{1}{\sigma_r} (\vec{x}_{test} \cdot \vec{v}_r) (\vec{u}_r \cdot E)$$
