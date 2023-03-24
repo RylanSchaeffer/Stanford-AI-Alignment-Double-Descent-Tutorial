@@ -6,7 +6,7 @@
 
 Consider a supervised dataset of $N$ training data for regression:
 
-$$ \mathcal{D} :=  \Big{ (\vec{x}n, y_n) \Big}{n=1}^N $$
+$$ \mathcal{D} :=  \{ (\vec{x}_n, y_n) }{n=1}^N $$
 
 with covariates $\vec{x}_n \in \mathbb{R}^D$ and targets $y_n \in \mathbb{R}$.
 We'll sometimes use matrix-vector notation to refer to our training data, treating the

@@ -1,14 +1,11 @@
 # Double Descent Demystified
 ## Identifying, Interpreting & Ablating the Sources of a Deep Learning Puzzle
 
-This repository contains the code and data for our preprint 
-"Double Descent Demystified: Identifying, Interpreting \& Ablating the Sources of a Deep Learning Puzzle".
-
+This repository contains the code and data for our preprint
+["Double Descent Demystified: Identifying, Interpreting \& Ablating the Sources of a Deep Learning Puzzle"](https://www.overleaf.com/read/xscfwstjdqwy).
 For a step-by-step explanation, see [our walkthrough](walkthrough.md).
+The work will soon be available on arXiv (and SAIL Blog and LessWrong?).
 
-The tutorial will be available on arXiv (and SAIL Blog and LessWrong?).
-
-[Overleaf Draft](https://www.overleaf.com/read/xscfwstjdqwy)
 
 ## Polynomial Regression on Synthetic Data
 
