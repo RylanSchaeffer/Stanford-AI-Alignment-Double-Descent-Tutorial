@@ -12,7 +12,7 @@ with covariates $\vec{x}_n \in \mathbb{R}^D$ and targets $y_n \in \mathbb{R}$.
 We'll sometimes use matrix-vector notation to refer to our training data, treating the
 features $\vec{x}_n$ as row vectors:
 
-$$X := \begin{bmatrix} - \vec{x}_1 - \\ \vdots\\ \vec{x}_N - \end{bmatrix} \in \mathbb{R}^{N \times D} \quad \quad \quad \quad Y := \begin{bmatrix} y_1\\ \vdots \\ y_N \end{bmatrix} \in \mathbb{R}^{N \times 1} $$
+$$X := \begin{bmatrix} - \vec{x}_1 - \\\\ \vdots \\\\ \vec{x}_N - \end{bmatrix} \in \mathbb{R}^{N \times D} \quad \quad \quad \quad Y := \begin{bmatrix} y_1 \\ \vdots \\ y_N \end{bmatrix} \in \mathbb{R}^{N \times 1} $$
 
 In general, our goal is to use our training dataset $\mathcal{D}$ find a function $f: \mathcal{X} \rightarrow \mathcal{Y}$ that makes:
 
@@ -146,7 +146,6 @@ $$\sum_{r=1}^R  \frac{1}{\sigma_r} (\vec{x}_{test} \cdot \vec{v}_r) (\vec{u}_r \
 
 **This equation is critical.** It reveals that our test prediction error (and thus, our test squared error!)
 will depend on an interaction between 3 quantities:
-
 
 1. How much the _training features_ $X$ vary in each direction; more formally, the inverse (non-zero) singular values of the _training features_ $X$:
 
