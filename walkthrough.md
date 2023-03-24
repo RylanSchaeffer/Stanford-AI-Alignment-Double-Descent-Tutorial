@@ -75,8 +75,8 @@ Here, we are able to invert the Gram matrix because it is full rank in the overp
 After fitting its parameters, the model will make the following predictions for a given test point $\vec{x}_{test}$:
 
 $$\begin{align*}
-    \hat{y}_{test, under} &= \vec{x}_{test} \cdot \hat{\Vec{\beta}}_{under} = \vec{x}_{test} \cdot (X^T X)^{-1} X^T Y\\
-    \hat{y}_{test, over} &= \vec{x}_{test} \cdot \hat{\Vec{\beta}}_{over} 
+    \hat{y}_{test, under} &= \vec{x}_{test} \cdot \hat{\vec{\beta}}_{under} = \vec{x}_{test} \cdot (X^T X)^{-1} X^T Y\\
+    \hat{y}_{test, over} &= \vec{x}_{test} \cdot \hat{\vec{\beta}}_{over} 
     = \vec{x}_{test} \cdot X^T (X X^T)^{-1} Y
 \end{align*}$$
 
@@ -99,12 +99,12 @@ new notation, we rewrite the model's predictions to show how the test datum's fe
 training data's features $X$ and training data's regression targets $Y$ interact. In the underparameterized regime:
 
 $$\begin{align*}
-    \hat{y}_{test,under} &= \Vec{x}_{test} \cdot (X^T X)^{-1} X^T Y\\
-    &= \Vec{x}_{test} \cdot (X^T X)^{-1} X^T (X \beta^* + E)\\
-    &= \Vec{x}_{test} \cdot (X^T X)^{-1} X^T X \beta^* + \vec{x}_{test} \cdot (X^T X)^{-1} X^T E\\
-    &= \underbrace{\Vec{x}_{test} \cdot \beta^*}_{:= y_{test}^*} +  \vec{x}_{test} \cdot (X^T X)^{-1} X^T E\\
+    \hat{y}_{test,under} &= \vec{x}_{test} \cdot (X^T X)^{-1} X^T Y\\
+    &= \vec{x}_{test} \cdot (X^T X)^{-1} X^T (X \beta^* + E)\\
+    &= \vec{x}_{test} \cdot (X^T X)^{-1} X^T X \beta^* + \vec{x}_{test} \cdot (X^T X)^{-1} X^T E\\
+    &= \underbrace{\vec{x}_{test} \cdot \beta^*}_{:= y_{test}^*} +  \vec{x}_{test} \cdot (X^T X)^{-1} X^T E\\
     \hat{y}_{test,under} - y_{test}^* &= \vec{x}_{test} \cdot (X^T X)^{-1} X^T E
-    % \hat{y}_{test,over} &= \underbrace{\vec{x}_{test} \cdot \vec{\beta}^*}_{:= y_{test}^*} \quad + \quad \Vec{x}_{test} \cdot \underbrace{X^T (X X^T)^{-1}}_{:= X^+} E
+    % \hat{y}_{test,over} &= \underbrace{\vec{x}_{test} \cdot \vec{\beta}^*}_{:= y_{test}^*} \quad + \quad \vec{x}_{test} \cdot \underbrace{X^T (X X^T)^{-1}}_{:= X^+} E
 \end{align*}$$
 
 This equation is important, but opaque. To extract the intuition, we will replace $X$ with its [Singular Value Decomposition](https://en.wikipedia.org/wiki/Singular_value_decomposition)
@@ -113,12 +113,12 @@ Let $R := rank(X)$ and let $\sigma_1 > \sigma_2 > ... > \sigma_R > 0$ be $X$'s (
 Recalling $E \in \mathbb{R}^{N \times 1}$, we can decompose the (underparameterized) prediction error $\hat{y}_{test, under}
 - y_{test}^*$ along the orthogonal singular modes:
 
-$$\hat{y}_{test, under} - y_{test}^* = \Vec{x}_{test} \cdot V \Sigma^{+} U^T E = \sum_{r=1}^R  \frac{1}{\sigma_r} (\Vec{x}_{test} \cdot \vec{v}_r) (\vec{u}_r \cdot E)$$
+$$\hat{y}_{test, under} - y_{test}^* = \vec{x}_{test} \cdot V \Sigma^{+} U^T E = \sum_{r=1}^R  \frac{1}{\sigma_r} (\vec{x}_{test} \cdot \vec{v}_r) (\vec{u}_r \cdot E)$$
 
 In the overparameterized regime, our calculations change slightly:
 
 $$\begin{align*}
-    \hat{y}_{test,over} &= \Vec{x}_{test} \cdot X^T (X X^T)^{-1}  Y\\
+    \hat{y}_{test,over} &= \vec{x}_{test} \cdot X^T (X X^T)^{-1}  Y\\
     &= \vec{x}_{test} \cdot X^T (X X^T)^{-1} (X \beta^* + E)\\
     &= \vec{x}_{test} \cdot X^T (X X^T)^{-1} X \beta^* + \vec{x}_{test} \cdot X^T (X X^T)^{-1} E\\
     \hat{y}_{test,over} - \underbrace{\vec{x}_{test} \cdot \beta^*}_{:= y_{test}^*} &= \vec{x}_{test} \cdot X^T (X X^T)^{-1} X \beta^*  - \vec{x}_{test} \cdot I_{D} \beta^* + \vec{x}_{test} \cdot (X^T X)^{-1} X^T E\\
@@ -129,8 +129,8 @@ If we again replace $X$ with its SVD $U S V^T$, we can again simplify $\vec{x}_{
 This yields our final equations for the prediction errors.
 
 $$\begin{align*}
-\hat{y}_{test,over} - y_{test}^* &= \vec{x}_{test} \cdot (X^T (X X^T)^{-1} X - I_D) \beta^* \quad \quad \quad \quad + && \sum_{r=1}^R  \frac{1}{\sigma_r} (\Vec{x}_{test} \cdot \vec{v}_r) (\vec{u}_r \cdot E)\\
-    \hat{y}_{test,under} - y_{test}^* &= &&\sum_{r=1}^R  \frac{1}{\sigma_r} (\Vec{x}_{test} \cdot \vec{v}_r) (\vec{u}_r \cdot E)
+\hat{y}_{test,over} - y_{test}^* &= \vec{x}_{test} \cdot (X^T (X X^T)^{-1} X - I_D) \beta^* \quad \quad \quad \quad + && \sum_{r=1}^R  \frac{1}{\sigma_r} (\vec{x}_{test} \cdot \vec{v}_r) (\vec{u}_r \cdot E)\\
+    \hat{y}_{test,under} - y_{test}^* &= &&\sum_{r=1}^R  \frac{1}{\sigma_r} (\vec{x}_{test} \cdot \vec{v}_r) (\vec{u}_r \cdot E)
 \end{align*}$$
 
 What is the discrepancy between the underparameterized prediction error and the overparameterized prediction error, 
