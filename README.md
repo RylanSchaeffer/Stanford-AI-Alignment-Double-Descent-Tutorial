@@ -1,8 +1,11 @@
-# What Double Descent Is and Why It Occurs
-## An Intuitive, Interpretable Understanding with Causal Ablations
+# Double Descent Demystified
+## Identifying, Interpreting & Ablating the Sources of a Deep Learning Puzzle
 
 This repository contains the code and data for our preprint 
-"What Double Descent Is and Why It Occurs: An Intuitive, Interpretable Understanding with Causal Ablations".
+"Double Descent Demystified: Identifying, Interpreting \& Ablating the Sources of a Deep Learning Puzzle".
+
+For a step-by-step explanation, see [our walkthrough](walkthrough.md).
+
 The tutorial will be available on arXiv (and SAIL Blog and LessWrong?).
 
 [Overleaf Draft](https://www.overleaf.com/read/xscfwstjdqwy)
