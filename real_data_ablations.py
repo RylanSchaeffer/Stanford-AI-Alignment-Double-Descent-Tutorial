@@ -7,6 +7,7 @@ import seaborn as sns
 from sklearn import datasets, linear_model
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
+from typing import Tuple
 
 
 # Set style
@@ -45,7 +46,20 @@ def load_who_life_expectancy(**kwargs):
     return X, y
 
 
+def generate_synthetic_data(return_X_y: bool,
+                            N: int = 1000,
+                            P: int = 30,
+                            D: int = 20,
+                            ) -> Tuple[np.ndarray, np.ndarray]:
+    X_bar = np.random.randn(N, P)
+    X = X_bar[:, :D]
+    beta_bar = np.random.randn(P, 1)
+    Y = X_bar @ beta_bar
+    return X, Y
+
+
 regression_datasets = [
+    ('Student-Teacher', generate_synthetic_data),
     ('California Housing', datasets.fetch_california_housing),
     ('Diabetes', datasets.load_diabetes,),
     ('WHO Life Expectancy', load_who_life_expectancy)
@@ -63,7 +77,6 @@ ablation_type_strs = [
 ]
 
 singular_value_cutoffs = np.logspace(-3, 0, 7)
-num_leading_singular_modes_to_keep = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 num_repeats = 30
 for dataset_name, dataset_fn in regression_datasets:
@@ -156,6 +169,12 @@ for dataset_name, dataset_fn in regression_datasets:
 
             # BEGIN: Project test datum features to training feature subspace.
             train_mse_test_features_in_training_feature_subspace = train_mse_unablated
+
+            if dataset_name == 'Student-Teacher':
+                num_leading_singular_modes_to_keep = [5, 10, 15, 20, 25]
+            else:
+                num_leading_singular_modes_to_keep = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
             for num_leading_sing_modes in num_leading_singular_modes_to_keep:
                 # Shape: (num features, num leading singular modes)
                 X_train_leading = U[:, :num_leading_sing_modes] @ np.diag(S[:num_leading_sing_modes]) @ Vt[:num_leading_sing_modes, :]
