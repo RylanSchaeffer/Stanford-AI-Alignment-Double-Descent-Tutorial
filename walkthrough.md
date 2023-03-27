@@ -12,7 +12,7 @@
 
 ***
 
-### Notation & Terminology
+## Notation & Terminology
 
 Consider a supervised dataset of $N$ training data for regression:
 
@@ -44,9 +44,7 @@ As a matter of terminology, there are typically three key parameters:
 We say that a model is _overparameterized_ (a.k.a. underconstrained) if $N < P$ and _underparameterized_ (a.k.a. overconstrained) if $N > P$. 
 The _interpolation threshold_ refers to where $N=P$, because when $P\geq N$, the model can perfectly interpolate the training points.
 
-***
-
-### Mathematical Intuition from Ordinary Linear Regression
+## Mathematical Intuition from Ordinary Linear Regression
 
 To offer an intuitive yet quantitative understanding of double descent, we turn to ordinary linear regression.
 Recall that in linear regression, the number of fit parameters $P$ must equal the dimension $D$ of the covariates; 
@@ -172,14 +170,44 @@ $$\vec{x}_{test} \cdot \vec{v}_r$$
 $$\vec{u}_r \cdot E$$
     
 
+## Geometric Intuition for Divergence at the Interpolation Threshold
 
-***
+Why does this divergence happen approaching the interpolation threshold? The answer is that the first factor becomes
+more likely to occur when approaching from either parameterization regime. The reason why the smallest non-zero singular
+value is likely to reach its lowest value at the interpolation threshold is a probabilistic one, based on the 
+[Marchenko–Pastur distribution](https://en.wikipedia.org/wiki/Marchenko\%E2\%80\%93Pastur\_distribution) 
+from random matrix theory. Because the Marchenko–Pastur distribution is rather technical, we instead focus on
+gaining intuition by thinking about how much variance we've seen along each orthogonal direction in the
+data feature space.
 
-### Geometric Intuition for Divergence at the Interpolation Threshold
+<p align="middle">
+  <img align="top" src="results/smallest_nonzero_singular_value/data_distribution.png" width="32%" />
+  <img align="top" src="results/smallest_nonzero_singular_value/data_distribution_num_data=1.png" width="32%" />
+  <img align="top" src="results/smallest_nonzero_singular_value/data_distribution_num_data=2.png" width="32%" />
+</p>
 
+<p align="middle">
+  <img align="top" src="results/smallest_nonzero_singular_value/data_distribution_num_data=3.png" width="32%" />
+  <img align="top" src="results/smallest_nonzero_singular_value/data_distribution_num_data=8.png" width="32%" />
+  <img align="top" src="results/smallest_nonzero_singular_value/data_distribution_num_data=100.png" width="32%" />
+</p>
 
+Suppose we're given a single training datum $\vec{x}_1$. So long as this datum isn't exactly zero, that datum varies
+in a single direction, meaning we gain information about the data distribution's variance in that direction. Of 
+course, the variance in all orthogonal directions is exactly 0, which the linear regression fit will ignore. Now, 
+suppose we're given a second training datum $\vec{x}_2$. Again, so long as this datum isn't exactly zero, that datum
+varies, but now, some fraction of $\vec{x}_2$ might have a positive projection along $\vec{x}_1$; if this happens 
+(and it likely will, since the two vectors are unlikely to be exactly orthogonal), the shared direction of the two 
+vectors gives us _more_ information about the variance in this shared direction, but gives us _less_ information
+about the second orthogonal direction of variation. This means that the training data's smallest non-zero singular
+value after 2 samples is probabilistically smaller than after 1 sample. As we gain more training data, thereby
+approaching the interpolation threshold, the probability that each additional datum has large variance in a new direction
+orthogonal to all previously seen directions grows increasingly unlikely. At the interpolation threshold,
+where $N = P = D$, in order for the $N$-th datum to avoid adding a small-but-nonzero singular value to the training data,
+two properties must hold: (1) there must be one dimension that none of the preceding $N-1$ training data varied in,
+and (2) the $N$-th datum needs to vary significantly in this single dimension. That's pretty unlikely!
+As we move beyond the interpolation threshold, the variance in each covariate dimension becomes increasingly clear,
+and the smallest non-zero singular values moves away from 0.
 
-***
-
-### Ablations
+## Ablations
 
