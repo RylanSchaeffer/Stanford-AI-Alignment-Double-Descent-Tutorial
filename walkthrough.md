@@ -1,9 +1,16 @@
 # Double Descent Demystified
 ## Identifying, Interpreting & Ablating the Sources of a Deep Learning Puzzle
 
+***
+
+### Table of Contents
+
 1. [Notation & Terminology](#notation--terminology)
 2. [Mathematical Intuition from Ordinary Linear Regression](#mathematical-intuition-from-ordinary-linear-regression)
-3. [Ablations](#ablations)
+3. [Geometric Intuition for Divergence at the Interpolation Threshold](#geometric-intuition-for-divergence-at-the-interpolation-threshold)
+4. [Ablations](#ablations)
+
+***
 
 ### Notation & Terminology
 
@@ -36,6 +43,8 @@ As a matter of terminology, there are typically three key parameters:
 
 We say that a model is _overparameterized_ (a.k.a. underconstrained) if $N < P$ and _underparameterized_ (a.k.a. overconstrained) if $N > P$. 
 The _interpolation threshold_ refers to where $N=P$, because when $P\geq N$, the model can perfectly interpolate the training points.
+
+***
 
 ### Mathematical Intuition from Ordinary Linear Regression
 
@@ -105,9 +114,9 @@ $$\begin{align*}
     \hat{y}_{test,under} &= \vec{x}_{test} \cdot (X^T X)^{-1} X^T Y\\
     &= \vec{x}_{test} \cdot (X^T X)^{-1} X^T (X \beta^* + E)\\
     &= \vec{x}_{test} \cdot (X^T X)^{-1} X^T X \beta^* + \vec{x}_{test} \cdot (X^T X)^{-1} X^T E\\
-    &= \underbrace{\vec{x}_{test} \cdot \beta^*}_{:= y_{test}^*} +  \vec{x}_{test} \cdot (X^T X)^{-1} X^T E\\
+    &= \vec{x}_{test} \cdot \beta^* +  \vec{x}_{test} \cdot (X^T X)^{-1} X^T E\\
     \hat{y}_{test,under} - y_{test}^* &= \vec{x}_{test} \cdot (X^T X)^{-1} X^T E
-    % \hat{y}_{test,over} &= \underbrace{\vec{x}_{test} \cdot \vec{\beta}^*}_{:= y_{test}^*} \quad + \quad \vec{x}_{test} \cdot \underbrace{X^T (X X^T)^{-1}}_{:= X^+} E
+    % \hat{y}_{test,over} &= \vec{x}_{test} \cdot \vec{\beta}^* \quad + \quad \vec{x}_{test} \cdot X^T (X X^T)^{-1} E
 \end{align*}$$
 
 This equation is important, but opaque. To extract the intuition, we will replace $X$ with its [Singular Value Decomposition](https://en.wikipedia.org/wiki/Singular_value_decomposition)
@@ -123,7 +132,7 @@ $$\begin{align*}
     \hat{y}_{test,over} &= \vec{x}_{test} \cdot X^T (X X^T)^{-1}  Y\\
     &= \vec{x}_{test} \cdot X^T (X X^T)^{-1} (X \beta^* + E)\\
     &= \vec{x}_{test} \cdot X^T (X X^T)^{-1} X \beta^* + \vec{x}_{test} \cdot X^T (X X^T)^{-1} E\\
-    \hat{y}_{test,over} - \underbrace{\vec{x}_{test} \cdot \beta^*}_{:= y_{test}^*} &= \vec{x}_{test} \cdot X^T (X X^T)^{-1} X \beta^*  - \vec{x}_{test} \cdot I_{D} \beta^* + \vec{x}_{test} \cdot (X^T X)^{-1} X^T E\\
+    \hat{y}_{test,over} - \vec{x}_{test} \cdot \beta^* &= \vec{x}_{test} \cdot X^T (X X^T)^{-1} X \beta^*  - \vec{x}_{test} \cdot I_{D} \beta^* + \vec{x}_{test} \cdot (X^T X)^{-1} X^T E\\
     \hat{y}_{test,over} - y_{test}^* &= \vec{x}_{test} \cdot (X^T (X X^T)^{-1} X - I_D) \beta^*  + \vec{x}_{test} \cdot (X^T X)^{-1} X^T E
 \end{align*}$$
 
@@ -163,6 +172,14 @@ $$\vec{x}_{test} \cdot \vec{v}_r$$
 $$\vec{u}_r \cdot E$$
     
 
+
+***
+
+### Geometric Intuition for Divergence at the Interpolation Threshold
+
+
+
+***
 
 ### Ablations
 
