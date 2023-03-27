@@ -220,8 +220,11 @@ of the three factors individually. Specifically, we do the following:
 
 1. No Small Singular Values in Training Features: As we run the ordinary linear regression fitting process, as we sweep the number of training data, we also sweep different singular value cutoffs and remove all singular values of the training features $X$ below the cutoff.
 2. Test Features Lie in the Training Features Subspace: As we run the ordinary linear regression fitting process, as we sweep the number of training data, we project the test features $\vec{x}_{test}$ onto the subspace spanned by the training features $X$ singular modes.
-3. No Residual Errors in the Optimal Model: We first use the entire dataset to fit a linear model $\vec{\beta}^*$, then replace $Y$ with $X \vec{\beta}^*$ and $y_{test}^*$ 
-with $\vec{x}_{test} \cdot \vec{\beta}^*$ to ensure the true relationship is linear. We then rerun our typical fitting process, sweeping the number of training data.
+3. No Residual Errors in the Optimal Model: We first use the entire dataset to fit a linear model $\vec{\beta}^*$, 
+then replace $Y$ with $X \vec{\beta}^*$
+and $y_{test}^*$ 
+with $\vec{x}_{test} \cdot \vec{\beta}^*$
+to ensure the true relationship is linear. We then rerun our typical fitting process, sweeping the number of training data.
 
 We first conduct experiments on a synthetic dataset in a student-teacher setup, and find that causally ablating each
 of the three factors prevents double descent from occurring.
