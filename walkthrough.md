@@ -140,7 +140,8 @@ $$\begin{align*}
 \end{align*}$$
 
 What is the discrepancy between the underparameterized prediction error and the overparameterized prediction error, 
-and from where does the discrepancy originate? The overparameterized prediction error has the extra term $\vec{x}_{test} \cdot (X^T (X X^T)^{-1} X - I_D) \beta^*$. 
+and from where does the discrepancy originate? The overparameterized prediction error has the extra term $\vec{x}_{test} \cdot (X^T (X X^T)^{-1} X - I_D) \beta^*$.
+
 To understand where this term originates, recall that our goal is to understand how fluctuations in the features $\vec{x}$
 correlate with fluctuations in the targets $y$. In the overparameterized regime, there are more parameters than there
 are data. Consequently, for $N$ data points in $D=P$ dimensions, the model can "see" fluctuations in at most $N$ dimensions,
@@ -154,15 +155,15 @@ $$\sum_{r=1}^R  \frac{1}{\sigma_r} (\vec{x}_{test} \cdot \vec{v}_r) (\vec{u}_r \
 **This equation is critical.** It reveals that our test prediction error (and thus, our test squared error!)
 will depend on an interaction between 3 quantities:
 
-1. How much the _training features_ $X$ vary in each direction; more formally, the inverse (non-zero) singular values of the _training features_ $X$:
+1. How much the training features $X$ vary in each direction; more formally, the inverse (non-zero) singular values of the training features $X$:
 
 $$\frac{1}{\sigma_r}$$
 
-2. How much, and in which directions, the _test features_ $\vec{x}_{test}$ vary relative to the _training features_ $X$; more formally: how $\vec{x}_{test}$ projects onto $X$'s right singular vectors $V$:
+2. How much, and in which directions, the test features $\vec{x}_{test}$ vary relative to the training features $X$; more formally: how $\vec{x}_{test}$ projects onto $X$'s right singular vectors $V$:
 
 $$\vec{x}_{test} \cdot \vec{v}_r$$
 
-3. How well the _best possible model in the model class_ can correlate the variance in the _training features_ $X$ with the _training regression targets_ $Y$; more formally: how the residuals $E$ of the best possible model in the model class (i.e. insurmountable "errors" from the "perspective" of the model class) project onto $X$'s left singular vectors $U$:
+3. How well the best possible model in the model class can correlate the variance in the training features $X$ with the training regression targets $Y$; more formally: how the residuals $E$ of the best possible model in the model class (i.e. insurmountable "errors" from the "perspective" of the model class) project onto $X$'s left singular vectors $U$:
 
 $$\vec{u}_r \cdot E$$
     
