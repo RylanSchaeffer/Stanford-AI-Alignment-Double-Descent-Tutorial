@@ -1,6 +1,9 @@
 # Double Descent Demystified
 ## Identifying, Interpreting & Ablating the Sources of a Deep Learning Puzzle
 
+1. [Notation & Terminology](#notation--terminology)
+2. [Mathematical Intuition from Ordinary Linear Regression](#mathematical-intuition-from-ordinary-linear-regression)
+3. [Ablations](#ablations)
 
 ### Notation & Terminology
 
@@ -159,3 +162,7 @@ $$\vec{x}_{test} \cdot \vec{v}_r$$
 
 $$\vec{u}_r \cdot E$$
     
+
+
+### Ablations
+

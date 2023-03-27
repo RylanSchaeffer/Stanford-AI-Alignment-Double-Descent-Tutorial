@@ -3,8 +3,10 @@
 
 This repository contains the code and data for our preprint
 ["Double Descent Demystified: Identifying, Interpreting \& Ablating the Sources of a Deep Learning Puzzle"](https://arxiv.org/abs/2303.14151).
-For a step-by-step explanation, see [our walkthrough](walkthrough.md).
-The work will soon be available on LessWrong (and the Stanford AI Labs Blog?).
+
+For a step-by-step explanation, see [the walkthrough](walkthrough.md).
+
+The walkthrough will soon be available on LessWrong (and the Stanford AI Labs Blog?).
 
 
 ## Polynomial Regression on Synthetic Data
