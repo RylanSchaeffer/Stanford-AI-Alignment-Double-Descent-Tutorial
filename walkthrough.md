@@ -6,7 +6,7 @@
 1. [Notation & Terminology](#notation--terminology)
 2. [Mathematical Intuition from Ordinary Linear Regression](#mathematical-intuition-from-ordinary-linear-regression)
 3. [Geometric Intuition for Divergence at the Interpolation Threshold](#geometric-intuition-for-divergence-at-the-interpolation-threshold)
-4. [Ablations](#ablations)
+4. [Ablating the 3 Necessary Factors for Double Descent](#ablating-the-3-necessary-factors-for-double-descent)
 
 
 ## Notation & Terminology
@@ -148,7 +148,7 @@ are data. Consequently, for $N$ data points in $D=P$ dimensions, the model can "
 but cannot "see" fluctuations in the remaining $P-N$ dimensions. This causes information about the optimal linear relationship
 $\vec{\beta}^*$ to be lost, which in turn increases the overparameterized prediction error $\hat{y}_{test, over} - y_{test}^*$.
 Statisticians call this term $\vec{x}\_{test} \cdot (X^T (X X^T)^{-1} X - I_D) \beta^*$ the "bias". 
-The other term (the ``variance") is what causes double descent:
+The other term (the "variance") is what causes double descent:
 
 $$\sum_{r=1}^R  \frac{1}{\sigma_r} (\vec{x}_{test} \cdot \vec{v}_r) (\vec{u}_r \cdot E)$$
 
@@ -207,20 +207,21 @@ and (2) the $N$-th datum needs to vary significantly in this single dimension. T
 As we move beyond the interpolation threshold, the variance in each covariate dimension becomes increasingly clear,
 and the smallest non-zero singular values moves away from 0.
 
-## Ablations
+## Ablating the 3 Necessary Factors for Double Descent
 
 Double descent will not occur if any of the three factors are absent. What could cause that?
 
-1. _Small-but-nonzero singular values do not appear in the training data features. One way to accomplish this is by switching from ordinary linear regression to ridge regression, which effectively adds a gap separating the smallest non-zero singular value from $0$. 
-2. The test datum does not vary in different directions than the training features. If the test datum lies entirely in the subspace of just a few of the leading singular directions, then double descent is unlikely to occur. 
-3. The best possible model in the model class makes no errors on the training data. For instance, suppose we use a linear model class on data where the true relationship is a noiseless linear one. Then, at the interpolation threshold, we will have $D=P$ data, $P=D$ parameters, our line of best fit will exactly match the true relationship, and no double descent will occur.
+1. *Small-but-nonzero singular values do not appear in the training data features*. One way to accomplish this is by switching from ordinary linear regression to ridge regression, which effectively adds a gap separating the smallest non-zero singular value from $0$. 
+2. *The test features does not vary in different directions than the training features*. If the test datum lies entirely in the subspace of just a few of the leading singular directions, then double descent is unlikely to occur. 
+3. *The best possible model in the model class makes no errors on the training data*. For instance, suppose we use a linear model class on data where the true relationship is a noiseless linear one. Then, at the interpolation threshold, we will have $D=P$ data, $P=D$ parameters, our line of best fit will exactly match the true relationship, and no double descent will occur.
 
 To confirm our understanding, we causally test the predictions of when double descent will not occur by ablating each
 of the three factors individually. Specifically, we do the following:
 
 1. No Small Singular Values in Training Features: As we run the ordinary linear regression fitting process, as we sweep the number of training data, we also sweep different singular value cutoffs and remove all singular values of the training features $X$ below the cutoff.
 2. Test Features Lie in the Training Features Subspace: As we run the ordinary linear regression fitting process, as we sweep the number of training data, we project the test features $\vec{x}_{test}$ onto the subspace spanned by the training features $X$ singular modes.
-3. No Residual Errors in the Optimal Model: We first use the entire dataset to fit a linear model $\vec{\beta}^*$, then replace $Y$ with $X \vec{\beta}^*$ and $y_{test}^*$ with $\vec{x}_{test} \cdot \vec{\beta}^*$ to ensure the true relationship is linear. We then rerun our typical fitting process, sweeping the number of training data.
+3. No Residual Errors in the Optimal Model: We first use the entire dataset to fit a linear model $\vec{\beta}^*$, then replace $Y$ with $X \vec{\beta}^*$ and $y_{test}^*$ 
+with $\vec{x}_{test} \cdot \vec{\beta}^*$ to ensure the true relationship is linear. We then rerun our typical fitting process, sweeping the number of training data.
 
 We first conduct experiments on a synthetic dataset in a student-teacher setup, and find that causally ablating each
 of the three factors prevents double descent from occurring.
