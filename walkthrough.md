@@ -12,7 +12,7 @@ with covariates $\vec{x}_n \in \mathbb{R}^D$ and targets $y_n \in \mathbb{R}$.
 We'll sometimes use matrix-vector notation to refer to our training data, treating the
 features $\vec{x}_n$ as row vectors:
 
-$$X := \begin{bmatrix} - \vec{x}_1 - \\\\ \vdots \\\\ \vec{x}_N - \end{bmatrix} \in \mathbb{R}^{N \times D} \quad \quad \quad \quad Y := \begin{bmatrix} y_1 \\ \vdots \\ y_N \end{bmatrix} \in \mathbb{R}^{N \times 1} $$
+$$X := \begin{bmatrix} - \vec{x}_1 - \\\\ \vdots \\\\ -\vec{x}_N - \end{bmatrix} \in \mathbb{R}^{N \times D} \quad \quad \quad \quad Y := \begin{bmatrix} y_1 \\\\ \vdots \\\\ y_N \end{bmatrix} \in \mathbb{R}^{N \times 1} $$
 
 In general, our goal is to use our training dataset $\mathcal{D}$ find a function $f: \mathcal{X} \rightarrow \mathcal{Y}$ that makes:
 
