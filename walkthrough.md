@@ -211,9 +211,9 @@ and the smallest non-zero singular values moves away from 0.
 
 Double descent will not occur if any of the three factors are absent. What could cause that?
 
-1. *Small-but-nonzero singular values do not appear in the training data features*. One way to accomplish this is by switching from ordinary linear regression to ridge regression, which effectively adds a gap separating the smallest non-zero singular value from $0$. 
-2. *The test features does not vary in different directions than the training features*. If the test datum lies entirely in the subspace of just a few of the leading singular directions, then double descent is unlikely to occur. 
-3. *The best possible model in the model class makes no errors on the training data*. For instance, suppose we use a linear model class on data where the true relationship is a noiseless linear one. Then, at the interpolation threshold, we will have $D=P$ data, $P=D$ parameters, our line of best fit will exactly match the true relationship, and no double descent will occur.
+1. **Small-but-nonzero singular values do not appear in the training data features**. One way to accomplish this is by switching from ordinary linear regression to ridge regression, which effectively adds a gap separating the smallest non-zero singular value from $0$. 
+2. **The test features does not vary in different directions than the training features**. If the test datum lies entirely in the subspace of just a few of the leading singular directions, then double descent is unlikely to occur. 
+3. **The best possible model in the model class makes no errors on the training data**. For instance, suppose we use a linear model class on data where the true relationship is a noiseless linear one. Then, at the interpolation threshold, we will have $D=P$ data, $P=D$ parameters, our line of best fit will exactly match the true relationship, and no double descent will occur.
 
 To confirm our understanding, we causally test the predictions of when double descent will not occur by ablating each
 of the three factors individually. Specifically, we do the following:
