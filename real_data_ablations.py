@@ -267,7 +267,8 @@ for dataset_name, dataset_fn in regression_datasets:
                 bbox_inches='tight',
                 dpi=300)
 
-    test_bias_squared_ymin = 0.9 * dataset_loss_unablated_df[dataset_loss_unablated_df['Subset Size'] == (X.shape[1] - 1)]['Test Bias Squared'].mean()
+    # 0.2 ensures we'll be able to see the value.
+    test_bias_squared_ymin = 0.2 * dataset_loss_unablated_df[dataset_loss_unablated_df['Subset Size'] == (X.shape[1] - 1)]['Test Bias Squared'].mean()
     plt.close()
     fig, ax = plt.subplots(figsize=(6, 5))
     fig.suptitle(f'Dataset: {dataset_name}')
