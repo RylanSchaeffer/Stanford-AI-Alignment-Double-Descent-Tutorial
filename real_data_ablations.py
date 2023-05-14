@@ -279,18 +279,29 @@ for dataset_name, dataset_fn in regression_datasets:
         color='purple',
         ax=ax,
     )
-    # The test bias will be 0 for all subset sizes >= X.shape[1]
-    # b/c the linear model exactly fits the linear data.
-    ax.plot([X.shape[1] - 1, dataset_loss_unablated_df['Subset Size'].max()],
-            [test_bias_squared_ymin, test_bias_squared_ymin],
-            color='purple',
-            linestyle='--',
-            label='Test = 0')
     ax.set_xlabel('Num. Training Samples')
     # ax.set_ylabel(r'$(\hat{\vec{x}}_{test} - \vec{x}_{test}) \cdot \beta^*$')
     ax.set_ylabel('Test Bias Squared')
     ax.axvline(x=X.shape[1], color='black', linestyle='--', label='Interpolation Threshold')
-    ax.set_ylim(bottom=test_bias_squared_ymin)
+    if dataset_name == 'Diabetes':
+        # The squared test bias for diabetes is 1e-26. This looks like shit so just overwrite it.
+        # The test bias will be 0 for all subset sizes >= X.shape[1]
+        # b/c the linear model exactly fits the linear data.
+        ax.plot([X.shape[1] - 1, dataset_loss_unablated_df['Subset Size'].max()],
+                [1e-2, 1e-2],
+                color='purple',
+                linestyle='--',
+                label='Test = 0')
+        ax.set_ylim(bottom=1e-2, top=1e1)
+    else:
+        # The test bias will be 0 for all subset sizes >= X.shape[1]
+        # b/c the linear model exactly fits the linear data.
+        ax.plot([X.shape[1] - 1, dataset_loss_unablated_df['Subset Size'].max()],
+                [test_bias_squared_ymin, test_bias_squared_ymin],
+                color='purple',
+                linestyle='--',
+                label='Test = 0')
+        ax.set_ylim(bottom=test_bias_squared_ymin)
     ax.set_yscale('log')
     ax.legend()
     plt.savefig(os.path.join(dataset_results_dir,
