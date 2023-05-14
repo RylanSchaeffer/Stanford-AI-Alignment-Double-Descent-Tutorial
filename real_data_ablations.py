@@ -81,6 +81,10 @@ singular_value_cutoffs = np.logspace(-3, 0, 7)
 num_repeats = 30
 for dataset_name, dataset_fn in regression_datasets:
     print('On dataset:', dataset_name)
+
+    dataset_results_dir = os.path.join(results_dir, dataset_name)
+    os.makedirs(dataset_results_dir, exist_ok=True)
+
     X, y = dataset_fn(return_X_y=True)
 
     # One ablation will be to make the true underlying relationship linear and noiseless.
@@ -111,6 +115,7 @@ for dataset_name, dataset_fn in regression_datasets:
 
             # BEGIN: Unablated linear fit.
             U, S, Vt = np.linalg.svd(X_train, full_matrices=False, compute_uv=True)
+            min_singular_value = np.min(S[S > 0.])
             S_inverted = 1. / S
             S_inverted[S_inverted == np.inf] = 0.
             beta_hat_unablated = Vt.T @ np.diag(S_inverted) @ U.T @ y_train
@@ -120,12 +125,19 @@ for dataset_name, dataset_fn in regression_datasets:
             test_mse_unablated = mean_squared_error(y_test, y_test_pred)
             # END: Unablated linear fit.
 
+            # BEGIN:
+            X_hat_test = X_test @ X_train.T @ np.linalg.pinv(X_train @ X_train.T) @ X_train
+            X_test_diff = X_hat_test - X_test
+            X_test_diff_inner_beta_ideal = np.mean(X_test_diff @ beta_ideal)
+
             dataset_loss_unablated_df.append({
                 'Dataset': dataset_name,
                 'Subset Size': subset_size,
                 'Train MSE': train_mse_unablated,
                 'Test MSE': test_mse_unablated,
                 'Repeat Index': repeat_idx,
+                'Test Bias Squared': np.square(X_test_diff_inner_beta_ideal),
+                'Smallest Non-Zero Singular Value': min_singular_value,
             })
 
             # BEGIN: No small singular values.
@@ -198,15 +210,17 @@ for dataset_name, dataset_fn in regression_datasets:
                 })
             # END: Test datum features in training feature subspace.
 
-    plt.close()
-    fig, axes = plt.subplots(nrows=1,
-                             ncols=4,
-                             figsize=(25, 5),
-                             sharex=True,
-                             sharey=True)
-    fig.suptitle(f'Dataset: {dataset_name}')
-    ax = axes[0]
     dataset_loss_unablated_df = pd.DataFrame(dataset_loss_unablated_df)
+
+    # Set consistent y limits based on the first plot (i.e. the unablated plot).
+    ymax = 2 * max(dataset_loss_unablated_df.groupby('Subset Size')[f'Test MSE'].mean().max(),
+                   dataset_loss_unablated_df.groupby('Subset Size')[f'Train MSE'].mean().max())
+    ymin = 0.5 * dataset_loss_unablated_df.groupby('Subset Size')[f'Train MSE'].mean()[X.shape[1] + 1]
+
+
+    plt.close()
+    fig, ax = plt.subplots(figsize=(6, 5))
+    fig.suptitle(f'Dataset: {dataset_name}')
     sns.lineplot(
         data=dataset_loss_unablated_df,
         x='Subset Size',
@@ -224,16 +238,69 @@ for dataset_name, dataset_fn in regression_datasets:
     ax.set_xlabel('Num. Training Samples')
     ax.set_ylabel('Mean Squared Error')
     ax.axvline(x=X.shape[1], color='black', linestyle='--', label='Interpolation Threshold')
-    ax.set_title('Unablated')
-    # Set the y limits based on the first plot b/c unablated will have the largest test error.
-    ymax = 2 * max(dataset_loss_unablated_df.groupby('Subset Size')[f'Test MSE'].mean().max(),
-                   dataset_loss_unablated_df.groupby('Subset Size')[f'Train MSE'].mean().max())
-    ymin = 0.5 * dataset_loss_unablated_df.groupby('Subset Size')[f'Train MSE'].mean()[X.shape[1] + 1]
+    ax.set_title('Condition: Unablated')
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale('log')
     ax.legend()
+    plt.savefig(os.path.join(dataset_results_dir,
+                             f'unablated'),
+                bbox_inches='tight',
+                dpi=300)
 
-    ax = axes[1]
+    plt.close()
+    fig, ax = plt.subplots(figsize=(6, 5))
+    fig.suptitle(f'Dataset: {dataset_name}')
+    sns.lineplot(
+        data=dataset_loss_unablated_df,
+        x='Subset Size',
+        y='Smallest Non-Zero Singular Value',
+        color='green',
+        ax=ax,
+    )
+    ax.set_xlabel('Num. Training Samples')
+    ax.set_ylabel('Smallest Non-Zero Singular\nValue of Training Features ' + r'$X$')
+    ax.axvline(x=X.shape[1], color='black', linestyle='--', label='Interpolation Threshold')
+    ax.set_yscale('log')
+    ax.legend()
+    plt.savefig(os.path.join(dataset_results_dir,
+                             f'least_informative_singular_value'),
+                bbox_inches='tight',
+                dpi=300)
+
+    test_bias_squared_ymin = 0.9 * dataset_loss_unablated_df[dataset_loss_unablated_df['Subset Size'] == (X.shape[1] - 1)]['Test Bias Squared'].mean()
+    plt.close()
+    fig, ax = plt.subplots(figsize=(6, 5))
+    fig.suptitle(f'Dataset: {dataset_name}')
+    sns.lineplot(
+        data=dataset_loss_unablated_df,
+        x='Subset Size',
+        y='Test Bias Squared',
+        color='purple',
+        ax=ax,
+    )
+    # The test bias will be 0 for all subset sizes >= X.shape[1]
+    # b/c the linear model exactly fits the linear data.
+    ax.plot([X.shape[1] - 1, dataset_loss_unablated_df['Subset Size'].max()],
+            [test_bias_squared_ymin, test_bias_squared_ymin],
+            color='purple',
+            linestyle='--',
+            label='Test = 0')
+    ax.set_xlabel('Num. Training Samples')
+    # ax.set_ylabel(r'$(\hat{\vec{x}}_{test} - \vec{x}_{test}) \cdot \beta^*$')
+    ax.set_ylabel('Test Bias Squared')
+    ax.axvline(x=X.shape[1], color='black', linestyle='--', label='Interpolation Threshold')
+    ax.set_ylim(bottom=test_bias_squared_ymin)
+    ax.set_yscale('log')
+    ax.legend()
+    plt.savefig(os.path.join(dataset_results_dir,
+                             f'test_bias_squared'),
+                bbox_inches='tight',
+                dpi=300)
+    # plt.show()
+
+    plt.close()
+    fig, ax = plt.subplots(figsize=(6, 5))
+    fig.suptitle(f'Dataset: {dataset_name}')
     dataset_loss_no_small_singular_values_df = pd.DataFrame(dataset_loss_no_small_singular_values_df)
     sns.lineplot(
         data=dataset_loss_no_small_singular_values_df,
@@ -255,11 +322,18 @@ for dataset_name, dataset_fn in regression_datasets:
         palette='OrRd',
     )
     ax.set_xlabel('Num. Training Samples')
-    ax.set_title('No Small Singular Values')
+    ax.set_title('Condition: No Small Singular Values')
     ax.axvline(x=X.shape[1], color='black', linestyle='--')
+    ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale('log')
+    plt.savefig(os.path.join(dataset_results_dir,
+                             f'no_small_singular_values'),
+                bbox_inches='tight',
+                dpi=300)
 
-    ax = axes[2]
+    plt.close()
+    fig, ax = plt.subplots(figsize=(6, 5))
+    fig.suptitle(f'Dataset: {dataset_name}')
     dataset_loss_test_features_in_training_feature_subspace_df = pd.DataFrame(
         dataset_loss_test_features_in_training_feature_subspace_df)
     sns.lineplot(
@@ -280,11 +354,18 @@ for dataset_name, dataset_fn in regression_datasets:
         palette='OrRd',
     )
     ax.set_xlabel('Num. Training Samples')
-    ax.set_title('Test Features in Training Feature Subspace')
+    ax.set_title('Condition: Test Features in Training Feature Subspace')
     ax.axvline(x=X.shape[1], color='black', linestyle='--')
+    ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale('log')
+    plt.savefig(os.path.join(dataset_results_dir,
+                             f'test_feat_in_train_feat_subspace'),
+                bbox_inches='tight',
+                dpi=300)
 
-    ax = axes[3]
+    plt.close()
+    fig, ax = plt.subplots(figsize=(6, 5))
+    fig.suptitle(f'Dataset: {dataset_name}')
     dataset_loss_no_residuals_in_ideal_fit_df = pd.DataFrame(dataset_loss_no_residuals_in_ideal_fit_df)
     ax.plot([1, dataset_loss_no_residuals_in_ideal_fit_df['Subset Size'].max()],
             [1.1 * ymin, 1.1 * ymin],
@@ -306,14 +387,12 @@ for dataset_name, dataset_fn in regression_datasets:
             linestyle='--',
             label='Test = 0')
     ax.set_xlabel('Num. Training Samples')
-    ax.set_title('No Residuals in Ideal Fit')
+    ax.set_title('Condition: No Residuals in Ideal Fit')
     ax.axvline(x=X.shape[1], color='black', linestyle='--')
+    ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale('log')
     ax.legend()
-
-    plt.savefig(os.path.join(results_dir,
-                             f'double_descent_ablations_dataset={dataset_name}'),
+    plt.savefig(os.path.join(dataset_results_dir,
+                             f'no_residuals_in_ideal'),
                 bbox_inches='tight',
                 dpi=300)
-    plt.show()
-
