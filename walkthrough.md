@@ -238,7 +238,7 @@ Next, we apply the same ablations to real world datasets (California Housing, Di
 in all three that removing any of the three factors prevents double descent.
 
 <p align="middle">
-  <img align="top" src="results/real_data_ablations/double_descent_ablations_dataset=California%20Housing.png" width="90%" />
-  <img align="top" src="results/real_data_ablations/double_descent_ablations_dataset=Diabetes.png" width="90%" />
-  <img align="top" src="results/real_data_ablations/double_descent_ablations_dataset=WHO%20Life%20Expectancy.png" width="90%" />
+  <img align="top" src="results/real_data_ablations/California%20Housing/unablated.png" width="90%" />
+  <img align="top" src="results/real_data_ablations/Diabetes/unablated.png" width="90%" />
+  <img align="top" src="results/real_data_ablations/WHO%20Life%20Expectancy" width="90%" />
 </p>

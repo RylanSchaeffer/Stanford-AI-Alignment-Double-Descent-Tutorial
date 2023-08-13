@@ -10,6 +10,8 @@ For a step-by-step explanation, see [the walkthrough](walkthrough.md). The walkt
   <img align="top" src="results/real_data_ablations/WHO%20Life%20Expectancy/unablated.png" width="95%" />
 </p>
 
+- For linear regression, see linear_regression.py`.
+
 
 ## Authorship
 
