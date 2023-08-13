@@ -10,7 +10,9 @@ For a step-by-step explanation, see [the walkthrough](walkthrough.md). The walkt
   <img align="top" src="results/real_data_ablations/WHO%20Life%20Expectancy/unablated.png" width="95%" />
 </p>
 
-- For linear regression, see linear_regression.py`.
+- For ordinary linear regression on real and synthetic data, see [linear_regression.py](linear_regression.py).
+- For ordinary linear regression on real and synthetic data with ablations of double descent, see [linear_regression_ablations.py](linear_regression_ablations.py) 
+- For polynomial regression on synthetic data, see [polynomial_regression.py](polynomial_regression.py).
 
 
 ## Authorship
