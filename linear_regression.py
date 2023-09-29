@@ -50,6 +50,7 @@ for dataset_name, dataset_fn in regression_datasets:
     ideal_regr.fit(X_all, y_all)
 
     dataset_loss_list = []
+    singular_modes_data_list = []
     for repeat_idx in range(num_repeats):
         # subset_sizes = np.arange(10, X_train.shape[0], X_train.shape[0] // 20)
         subset_sizes = np.arange(1, 50, 1)
@@ -104,6 +105,7 @@ for dataset_name, dataset_fn in regression_datasets:
                 "Smallest Non-Zero Singular Value": min_singular_value,
                 "Fraction Outside": fraction_outside,
             }
+            dataset_loss_list.append(dataset_loss_results)
 
             U, S, Vh = np.linalg.svd(X_train, full_matrices=False)
             # Shape: (num test data, num singular modes)
@@ -114,16 +116,19 @@ for dataset_name, dataset_fn in regression_datasets:
             term_three_average_per_mode = np.abs(np.mean(term_three, axis=1))
 
             for mode_idx in range(term_two_average_per_mode.shape[0]):
-                dataset_loss_results[
-                    f"Term Two Mode={mode_idx+1}"
-                ] = term_two_average_per_mode[mode_idx]
-                dataset_loss_results[
-                    f"Term Three Mode={mode_idx+1}"
-                ] = term_three_average_per_mode[mode_idx]
-
-            dataset_loss_list.append(dataset_loss_results)
+                singular_modes_data = {
+                    "Dataset": dataset_name,
+                    "Subset Size": subset_size,
+                    "Repeat Index": repeat_idx,
+                    "Singular Index": mode_idx + 1,
+                    "Singular Index From Smallest": len(S) - mode_idx + 1,
+                    "Term Two": term_two_average_per_mode[mode_idx],
+                    "Term Three": term_three_average_per_mode[mode_idx],
+                }
+                singular_modes_data_list.append(singular_modes_data)
 
     dataset_loss_df = pd.DataFrame(dataset_loss_list)
+    singular_modes_df = pd.DataFrame(singular_modes_data_list)
 
     plt.close()
     plt.figure(figsize=(6, 5))
@@ -159,12 +164,13 @@ for dataset_name, dataset_fn in regression_datasets:
     )
     plt.ylim(bottom=ymin, top=ymax)
     plt.legend()
+    plt.tight_layout()
     plt.savefig(
         os.path.join(dataset_results_dir, f"double_descent_dataset"),
         bbox_inches="tight",
         dpi=300,
     )
-    plt.show()
+    # plt.show()
 
     plt.close()
     plt.figure(figsize=(6, 5))
@@ -182,6 +188,7 @@ for dataset_name, dataset_fn in regression_datasets:
     plt.title(title)
     plt.yscale("log")
     plt.legend()
+    plt.tight_layout()
     plt.savefig(
         os.path.join(
             dataset_results_dir,
@@ -190,8 +197,7 @@ for dataset_name, dataset_fn in regression_datasets:
         bbox_inches="tight",
         dpi=300,
     )
-    plt.show()
-    plt.close()
+    # plt.show()
 
     plt.close()
     # Set figure size
@@ -212,6 +218,7 @@ for dataset_name, dataset_fn in regression_datasets:
     )
     plt.title(title)
     plt.yscale("log")
+    plt.tight_layout()
     plt.savefig(
         os.path.join(
             dataset_results_dir,
@@ -220,27 +227,14 @@ for dataset_name, dataset_fn in regression_datasets:
         bbox_inches="tight",
         dpi=300,
     )
-    plt.show()
-    term_two_columns = [
-        col for col in dataset_loss_df.columns.values if col.startswith("Term Two")
-    ]
-    term_two_df = dataset_loss_df[
-        ["Dataset", "Subset Size", "Repeat Index"] + term_two_columns
-    ]
-    term_two_melted_df = term_two_df.melt(
-        id_vars=["Dataset", "Subset Size", "Repeat Index"],
-        var_name="Singular Mode",
-        value_name="Term Two",
-    )
-    term_two_melted_df["Singular Mode"] = term_two_melted_df["Singular Mode"].apply(
-        lambda x: int(x.split("=")[1])
-    )
+    # plt.show()
+
     plt.close()
     g = sns.lineplot(
-        data=term_two_melted_df,
+        data=singular_modes_df,
         x="Subset Size",
         y="Term Two",
-        hue="Singular Mode",
+        hue="Singular Index",
     )
     sns.move_legend(g, "upper left", bbox_to_anchor=(1, 1))
     plt.xlabel("Num. Training Samples")
@@ -250,36 +244,49 @@ for dataset_name, dataset_fn in regression_datasets:
     )
     plt.yscale("log")
     plt.title(title)
+    plt.tight_layout()
     plt.savefig(
         os.path.join(
             dataset_results_dir,
-            f"term_two_singular_mode_contributions",
+            f"term_two_singular_mode_contributions_indexed_from_leading",
         ),
         bbox_inches="tight",
         dpi=300,
     )
     # plt.show()
 
-    term_three_columns = [
-        col for col in dataset_loss_df.columns.values if col.startswith("Term Three")
-    ]
-    term_three_df = dataset_loss_df[
-        ["Dataset", "Subset Size", "Repeat Index"] + term_three_columns
-    ]
-    term_three_melted_df = term_three_df.melt(
-        id_vars=["Dataset", "Subset Size", "Repeat Index"],
-        var_name="Singular Mode",
-        value_name="Term Three",
-    )
-    term_three_melted_df["Singular Mode"] = term_three_melted_df["Singular Mode"].apply(
-        lambda x: int(x.split("=")[1])
-    )
     plt.close()
     g = sns.lineplot(
-        data=term_three_melted_df,
+        data=singular_modes_df,
+        x="Subset Size",
+        y="Term Two",
+        hue="Singular Index From Smallest",
+    )
+    sns.move_legend(g, "upper left", bbox_to_anchor=(1, 1))
+    plt.xlabel("Num. Training Samples")
+    plt.ylabel(r"$|\; \vec{x}_{test} \cdot \vec{v}_r \; |$")
+    plt.axvline(
+        x=X_all.shape[1], color="black", linestyle="--", label="Interpolation Threshold"
+    )
+    plt.yscale("log")
+    plt.title(title)
+    plt.tight_layout()
+    plt.savefig(
+        os.path.join(
+            dataset_results_dir,
+            f"term_two_singular_mode_contributions_indexed_from_smallest",
+        ),
+        bbox_inches="tight",
+        dpi=300,
+    )
+    # plt.show()
+
+    plt.close()
+    g = sns.lineplot(
+        data=singular_modes_df,
         x="Subset Size",
         y="Term Three",
-        hue="Singular Mode",
+        hue="Singular Index",
     )
     sns.move_legend(g, "upper left", bbox_to_anchor=(1, 1))
     plt.xlabel("Num. Training Samples")
@@ -288,10 +295,36 @@ for dataset_name, dataset_fn in regression_datasets:
         x=X_all.shape[1], color="black", linestyle="--", label="Interpolation Threshold"
     )
     plt.title(title)
+    plt.tight_layout()
     plt.savefig(
         os.path.join(
             dataset_results_dir,
-            f"term_three_singular_mode_contributions",
+            f"term_three_singular_mode_contributions_indexed_from_leading",
+        ),
+        bbox_inches="tight",
+        dpi=300,
+    )
+    # plt.show()
+
+    plt.close()
+    g = sns.lineplot(
+        data=singular_modes_df,
+        x="Subset Size",
+        y="Term Three",
+        hue="Singular Index From Smallest",
+    )
+    sns.move_legend(g, "upper left", bbox_to_anchor=(1, 1))
+    plt.xlabel("Num. Training Samples")
+    plt.ylabel(r"$|\; \vec{u}_R \cdot E \; |$")
+    plt.axvline(
+        x=X_all.shape[1], color="black", linestyle="--", label="Interpolation Threshold"
+    )
+    plt.title(title)
+    plt.tight_layout()
+    plt.savefig(
+        os.path.join(
+            dataset_results_dir,
+            f"term_three_singular_mode_contributions_indexed_from_smallest",
         ),
         bbox_inches="tight",
         dpi=300,
