@@ -21,23 +21,13 @@ np.random.seed(0)
 regression_datasets = [
     ("Student-Teacher", generate_synthetic_data),
     ("California Housing", datasets.fetch_california_housing),
-    (
-        "Diabetes",
-        datasets.load_diabetes,
-    ),
+    ("Diabetes", datasets.load_diabetes),
     ("WHO Life Expectancy", load_who_life_expectancy),
 ]
 
 
 results_dir = "results/real_data_ablations"
 os.makedirs(results_dir, exist_ok=True)
-
-ablation_type_strs = [
-    "Unablated",
-    "No Small Singular Values",
-    "No Residuals in Ideal Fit",
-    "Test Datum Features in Training Feature Subspace",
-]
 
 singular_value_cutoffs = np.logspace(-3, 0, 7)
 

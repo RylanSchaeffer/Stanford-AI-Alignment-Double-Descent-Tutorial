@@ -19,7 +19,7 @@ def generate_synthetic_data(
 def load_who_life_expectancy(**kwargs):
     # https://www.kaggle.com/kumarajarshi/life-expectancy-who
 
-    life_expectancy_df = pd.read_csv("Life Expectancy Data.csv")
+    life_expectancy_df = pd.read_csv("data/Life Expectancy Data.csv")
     life_expectancy_df.dropna(inplace=True)
 
     X = life_expectancy_df[
