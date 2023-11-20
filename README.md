@@ -4,10 +4,10 @@ This repository contains the code and data for our preprint
 ["Double Descent Demystified: Identifying, Interpreting \& Ablating the Sources of a Deep Learning Puzzle"](https://arxiv.org/abs/2303.14151).
 
 <p align="middle">
-  <img align="top" src="results/real_data_ablations/Student-Teacher/unablated.png" width="25%" />
-  <img align="top" src="results/real_data_ablations/California%20Housing/unablated.png" width="25%" />
-  <img align="top" src="results/real_data_ablations/Diabetes/unablated.png" width="25%" />
-  <img align="top" src="results/real_data_ablations/WHO%20Life%20Expectancy/unablated.png" width="25%" />
+  <img align="top" src="results/real_data_ablations/Student-Teacher/unablated.png" width="45%" />
+  <img align="top" src="results/real_data_ablations/California%20Housing/unablated.png" width="45%" />
+  <img align="top" src="results/real_data_ablations/Diabetes/unablated.png" width="45%" />
+  <img align="top" src="results/real_data_ablations/WHO%20Life%20Expectancy/unablated.png" width="45%" />
 </p>
 
 
