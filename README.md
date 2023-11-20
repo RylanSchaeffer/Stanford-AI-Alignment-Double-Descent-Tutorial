@@ -36,13 +36,14 @@ Minimizing code duplication was intentionally not a priority.
 
 ### Double Descent in Linear Regression
 
+
+
 Run [linear_regression_ablations.py](linear_regression_ablations.py).
-
-
 
 ### Adversarial Training and Test Data in Linear Regression
 
-Run [linear_regression_adversarial.py](linear_regression_adversarial.py).
+To study how to create adversarial (test) examples or adversarial training data, 
+run [linear_regression_adversarial.py](linear_regression_adversarial.py).
 
 <p align="middle">
   <img align="top" src="results/real_data_adversarial/California%20Housing/adversarial_test_datum.png" width="45%" />
@@ -51,7 +52,8 @@ Run [linear_regression_adversarial.py](linear_regression_adversarial.py).
 
 ### Geometric Intuition for Smallest Non-Zero Singular Value
 
-Run [smallest_nonzero_singular_value.py](smallest_nonzero_singular_value.py)
+To understand why small non-zero singular values are likely to appear near the interpolation threshold,
+run [smallest_nonzero_singular_value.py](smallest_nonzero_singular_value.py)
 
 <p align="middle">
   <img align="top" src="results/smallest_nonzero_singular_value/data_distribution_num_data=9.png" width="45%" />
@@ -59,11 +61,17 @@ Run [smallest_nonzero_singular_value.py](smallest_nonzero_singular_value.py)
 
 ### Double Descent in Polynomial Regression
 
-Run [polynomial_regression.py](polynomial_regression.py).
+To build intuition in a setting where the number of parameters needn't equal the number of dimensions,
+run [polynomial_regression.py](polynomial_regression.py).
+
+<p align="middle">
+  <img align="top" src="results/polynomial_regression/num_data=15/mse_num_data=15.png" width="45%" />
+</p>
+
 
 ## Contributing
 
-Contact Rylan Schaeffer at rylanschaeffer@gmail.com. General preferences:
+Reach out to Rylan Schaeffer at rylanschaeffer@gmail.com. General preferences:
 
 1. Use `black` to format your code. See here for more information. To install, `pip install black`. To format the repo, run black . from the root directory. 
 2. Use type hints as much as possible. 
