@@ -13,9 +13,8 @@ This repository contains the code and data for our preprint
 
 ## Setup
 
-We include a conda environment file but this is honestly overkill. As long as you have `matplotlib`,
-`numpy`, `pandas`, `scikit-learn` and `seaborn`, you should be good to go. If you insist on creating
-a new conda environment, here are the steps:
+We include a conda environment file but this is honestly overkill. You should only need `matplotlib`,
+`numpy`, `pandas`, `scikit-learn` and `seaborn`. If you insist on a new conda environment, here are the steps:
 
 (Optional) Update conda:
 
@@ -31,19 +30,20 @@ To activate the environment:
 
 ## Running
 
-Note: the code was written for simplicity and understandability.
+Note: The code was written for simplicity and understandability.
 Minimizing code duplication was intentionally not a priority. 
 
 ### Double Descent in Linear Regression
 
-
-
-Run [linear_regression_ablations.py](linear_regression_ablations.py).
+To reproduce the double descent and the ablations of each of the three factors,
+run [linear_regression_ablations.py](linear_regression_ablations.py).
+Note: if you want fast but noisy results, set `num_repeats` to a smaller number.
 
 ### Adversarial Training and Test Data in Linear Regression
 
-To study how to create adversarial (test) examples or adversarial training data, 
+To study how to create adversarial test examples or adversarial training data, 
 run [linear_regression_adversarial.py](linear_regression_adversarial.py).
+Note: if you want fast but noisy results, set `num_repeats` to a smaller number.
 
 <p align="middle">
   <img align="top" src="results/real_data_adversarial/California%20Housing/adversarial_test_datum.png" width="45%" />

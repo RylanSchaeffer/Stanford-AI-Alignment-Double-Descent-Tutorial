@@ -30,7 +30,7 @@ os.makedirs(results_dir, exist_ok=True)
 
 singular_value_cutoffs = np.logspace(-3, 0, 7)
 
-num_repeats = 30
+num_repeats = 50
 for dataset_name, dataset_fn in regression_datasets:
     print("On dataset:", dataset_name)
 

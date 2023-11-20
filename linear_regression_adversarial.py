@@ -32,7 +32,7 @@ os.makedirs(results_dir, exist_ok=True)
 
 singular_value_cutoffs = np.logspace(-3, 0, 7)
 
-num_repeats = 30
+num_repeats = 50
 # Chosen for good logarithmic spacing.
 adversarial_test_datum_prefactors = [0.0, 0.1, 0.316, 1.0, 3.16, 10.0, 31.6]
 adversarial_train_data_prefactors = [0.0, 0.1, 0.316, 1.0, 3.16, 10.0, 31.6]
