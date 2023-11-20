@@ -1,0 +1,9 @@
+name: double_descent
+dependencies:
+  - python=3.10
+  - black
+  - matplotlib
+  - numpy
+  - pandas
+  - scikit-learn
+  - seaborn

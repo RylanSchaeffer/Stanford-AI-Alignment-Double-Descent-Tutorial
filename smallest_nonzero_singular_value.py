@@ -1,14 +1,9 @@
 import matplotlib.pyplot as plt
 import os
-import pandas as pd
 import numpy as np
 import seaborn as sns
-from sklearn import datasets, linear_model
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import train_test_split
 
-from arrow3D import Arrow3D
-
+from src.plot import Arrow3D, save_plot_with_multiple_extensions
 
 # Set style
 sns.set_style("whitegrid")
@@ -132,10 +127,7 @@ for num_data in num_data_list:
 
     ax.set_title("Num Data: {}".format(num_data))
 
-    plt.tight_layout()
-    plt.savefig(
-        os.path.join(results_dir, f"data_distribution_num_data={num_data}"),
-        bbox_inches="tight",
-        dpi=300,
+    save_plot_with_multiple_extensions(
+        plot_dir=results_dir,
+        plot_title=f"data_distribution_num_data={num_data}",
     )
-    plt.show()

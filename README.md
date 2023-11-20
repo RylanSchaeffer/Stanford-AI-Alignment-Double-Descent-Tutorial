@@ -1,5 +1,4 @@
-# Double Descent Demystified
-## Identifying, Interpreting & Ablating the Sources of a Deep Learning Puzzle
+# Double Descent Demystified: Identifying, Interpreting & Ablating the Sources of a Deep Learning Puzzle
 
 This repository contains the code and data for our preprint
 ["Double Descent Demystified: Identifying, Interpreting \& Ablating the Sources of a Deep Learning Puzzle"](https://arxiv.org/abs/2303.14151).
@@ -16,6 +15,34 @@ For a step-by-step explanation, see [the walkthrough](walkthrough.md). The walkt
 </p>
 
 
+## Setup
+
+We include a conda environment file but this is honestly overkill. As long as you have `matplotlib`,
+`numpy`, `pandas`, `scikit-learn` and `seaborn`, you should be good to go. If you insist on creating
+a new conda environment, here are the steps:
+
+(Optional) Update conda:
+
+`conda update -n base -c defaults conda`
+
+Create a conda environment with the required packages:
+
+`conda env create --file environment.yml`
+
+To activate the environment:
+
+`conda activate double_descent`
+
+## Running
+
+
+
+## Contributing
+
+1. Use `black` to format your code. See here for more information. To install, `pip install black`. To format the repo, run black . from the root directory. 
+2. Use type hints as much as possible. 
+3. Imports should proceed in two blocks: (1) general python libraries, (2) custom python code. Both blocks should be alphabetically ordered.
+
 ## Authorship
 
-Authors: Rylan Schaeffer, Mikail Khona, Zachary Robertson, Akhilan Boopathy, Kateryna Pistunova, Jason W. Rocks, Ila Rani Fiete, Sanmi Koyejo.
+Authors: Rylan Schaeffer, Zachary Robertson, Akhilan Boopathy, Mikail Khona, Kateryna Pistunova, Jason W. Rocks, Ila Rani Fiete, Sanmi Koyejo.

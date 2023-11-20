@@ -9,7 +9,8 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from typing import Tuple
 
-from src.utils import generate_synthetic_data, load_who_life_expectancy
+from src.plot import save_plot_with_multiple_extensions
+from src.utils import ylim_by_dataset, generate_synthetic_data, load_who_life_expectancy
 
 # Set style
 sns.set_style("whitegrid")
@@ -19,9 +20,9 @@ np.random.seed(0)
 
 
 regression_datasets = [
-    ("Student-Teacher", generate_synthetic_data),
     ("California Housing", datasets.fetch_california_housing),
     ("Diabetes", datasets.load_diabetes),
+    ("Student-Teacher", generate_synthetic_data),
     ("WHO Life Expectancy", load_who_life_expectancy),
 ]
 
@@ -32,7 +33,7 @@ os.makedirs(results_dir, exist_ok=True)
 singular_value_cutoffs = np.logspace(-3, 0, 7)
 
 num_repeats = 30
-# num_repeats = 9
+# Chosen for good logarithmic spacing.
 adversarial_test_datum_prefactors = [0.0, 0.1, 0.316, 1.0, 3.16, 10.0, 31.6]
 adversarial_train_data_prefactors = [0.0, 0.1, 0.316, 1.0, 3.16, 10.0, 31.6]
 
@@ -157,28 +158,7 @@ for dataset_name, dataset_fn in regression_datasets:
     dataset_adversarial_train_data_df = pd.DataFrame(dataset_adversarial_train_data_df)
     dataset_adversarial_test_datum_df = pd.DataFrame(dataset_adversarial_test_datum_df)
 
-    # Set consistent y limits based on the first plot (i.e. the unablated plot).
-    ymax = 2 * max(
-        dataset_loss_unablated_df.groupby("Subset Size")[f"Test MSE"].mean().max(),
-        dataset_adversarial_test_datum_df.groupby("Subset Size")[f"Test MSE"]
-        .mean()
-        .max(),
-        dataset_adversarial_train_data_df.groupby("Subset Size")[f"Test MSE"]
-        .mean()
-        .max(),
-    )
-    ymin = 0.5 * max(
-        0.1,  # We don't want to see 1e-26 or whatever.
-        min(
-            dataset_loss_unablated_df.groupby("Subset Size")[f"Train MSE"].mean().min(),
-            dataset_adversarial_test_datum_df.groupby("Subset Size")[f"Train MSE"]
-            .mean()
-            .min(),
-            dataset_adversarial_train_data_df.groupby("Subset Size")[f"Train MSE"]
-            .mean()
-            .min(),
-        ),
-    )
+    ymin, ymax = ylim_by_dataset[dataset_name]
 
     plt.close()
     fig, ax = plt.subplots(figsize=(6, 5))
@@ -202,12 +182,12 @@ for dataset_name, dataset_fn in regression_datasets:
     ax.axvline(
         x=X.shape[1], color="black", linestyle="--", label="Interpolation Threshold"
     )
-    ax.set_title("Condition: Unablated")
+    ax.set_title("Ablation: None")
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale("log")
     ax.legend()
-    plt.savefig(
-        os.path.join(dataset_results_dir, f"unablated"), bbox_inches="tight", dpi=300
+    save_plot_with_multiple_extensions(
+        plot_dir=dataset_results_dir, plot_title="unablated"
     )
 
     plt.close()
@@ -231,14 +211,12 @@ for dataset_name, dataset_fn in regression_datasets:
         palette="OrRd",
     )
     ax.set_xlabel("Num. Training Samples")
-    ax.set_title("Condition: Adversarial Test Datum")
+    ax.set_title("Ablation: Adversarial Test Datum")
     ax.axvline(x=X.shape[1], color="black", linestyle="--")
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale("log")
-    plt.savefig(
-        os.path.join(dataset_results_dir, f"adversarial_test_datum"),
-        bbox_inches="tight",
-        dpi=300,
+    save_plot_with_multiple_extensions(
+        plot_dir=dataset_results_dir, plot_title="adversarial_test_datum"
     )
 
     plt.close()
@@ -262,14 +240,12 @@ for dataset_name, dataset_fn in regression_datasets:
         palette="OrRd",
     )
     ax.set_xlabel("Num. Training Samples")
-    ax.set_title("Condition: Adversarial Training Data")
+    ax.set_title("Ablation: Adversarial Training Data")
     ax.axvline(x=X.shape[1], color="black", linestyle="--")
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale("log")
-    plt.savefig(
-        os.path.join(dataset_results_dir, f"adversarial_train_data"),
-        bbox_inches="tight",
-        dpi=300,
+    save_plot_with_multiple_extensions(
+        plot_dir=dataset_results_dir, plot_title="adversarial_train_data"
     )
 
 print("Finished linear_regression_adversarial.py!")

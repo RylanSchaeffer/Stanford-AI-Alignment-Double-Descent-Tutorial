@@ -3,6 +3,14 @@ import pandas as pd
 from typing import Tuple
 
 
+ylim_by_dataset = {
+    "Student-Teacher": (1e-1, 1e8),
+    "California Housing": (1e-2, 1e8),
+    "Diabetes": (1e3, 3.16e7),
+    "WHO Life Expectancy": (1e0, 1e11),
+}
+
+
 def generate_synthetic_data(
     return_X_y: bool,
     N: int = 1000,

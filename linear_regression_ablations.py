@@ -9,19 +9,18 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from typing import Tuple
 
+from src.plot import save_plot_with_multiple_extensions
 from src.utils import generate_synthetic_data, load_who_life_expectancy
 
-# Set style
-sns.set_style("whitegrid")
 
 # Set seed for reproducibility.
 np.random.seed(0)
 
 
 regression_datasets = [
-    ("Student-Teacher", generate_synthetic_data),
     ("California Housing", datasets.fetch_california_housing),
     ("Diabetes", datasets.load_diabetes),
+    ("Student-Teacher", generate_synthetic_data),
     ("WHO Life Expectancy", load_who_life_expectancy),
 ]
 
@@ -237,12 +236,12 @@ for dataset_name, dataset_fn in regression_datasets:
     ax.axvline(
         x=X.shape[1], color="black", linestyle="--", label="Interpolation Threshold"
     )
-    ax.set_title("Condition: Unablated")
+    ax.set_title("Ablation: None")
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale("log")
     ax.legend()
-    plt.savefig(
-        os.path.join(dataset_results_dir, f"unablated"), bbox_inches="tight", dpi=300
+    save_plot_with_multiple_extensions(
+        plot_dir=dataset_results_dir, plot_title="unablated"
     )
 
     plt.close()
@@ -262,10 +261,9 @@ for dataset_name, dataset_fn in regression_datasets:
     )
     ax.set_yscale("log")
     ax.legend()
-    plt.savefig(
-        os.path.join(dataset_results_dir, f"least_informative_singular_value"),
-        bbox_inches="tight",
-        dpi=300,
+    save_plot_with_multiple_extensions(
+        plot_dir=dataset_results_dir,
+        plot_title="least_informative_singular_value",
     )
 
     # 0.2 ensures we'll be able to see the value.
@@ -292,7 +290,7 @@ for dataset_name, dataset_fn in regression_datasets:
         x=X.shape[1], color="black", linestyle="--", label="Interpolation Threshold"
     )
     if dataset_name == "Diabetes":
-        # The squared test bias for diabetes is 1e-26. This looks like shit so just overwrite it.
+        # The squared test bias for diabetes is 1e-26. This looks terrible so just overwrite it.
         # The test bias will be 0 for all subset sizes >= X.shape[1]
         # b/c the linear model exactly fits the linear data.
         ax.plot(
@@ -316,10 +314,8 @@ for dataset_name, dataset_fn in regression_datasets:
         ax.set_ylim(bottom=test_bias_squared_ymin)
     ax.set_yscale("log")
     ax.legend()
-    plt.savefig(
-        os.path.join(dataset_results_dir, f"test_bias_squared"),
-        bbox_inches="tight",
-        dpi=300,
+    save_plot_with_multiple_extensions(
+        plot_dir=dataset_results_dir, plot_title="test_bias_squared"
     )
     # plt.show()
 
@@ -349,14 +345,13 @@ for dataset_name, dataset_fn in regression_datasets:
         palette="OrRd",
     )
     ax.set_xlabel("Num. Training Samples")
-    ax.set_title("Condition: No Small Singular Values")
+    ax.set_title("Ablation: No Small Singular Values")
     ax.axvline(x=X.shape[1], color="black", linestyle="--")
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale("log")
-    plt.savefig(
-        os.path.join(dataset_results_dir, f"no_small_singular_values"),
-        bbox_inches="tight",
-        dpi=300,
+    save_plot_with_multiple_extensions(
+        plot_dir=dataset_results_dir,
+        plot_title="no_small_singular_values",
     )
 
     plt.close()
@@ -383,14 +378,12 @@ for dataset_name, dataset_fn in regression_datasets:
         palette="OrRd",
     )
     ax.set_xlabel("Num. Training Samples")
-    ax.set_title("Condition: Test Features in Training Feature Subspace")
+    ax.set_title("Ablation: Test Features in Training Feature Subspace")
     ax.axvline(x=X.shape[1], color="black", linestyle="--")
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale("log")
-    plt.savefig(
-        os.path.join(dataset_results_dir, f"test_feat_in_train_feat_subspace"),
-        bbox_inches="tight",
-        dpi=300,
+    save_plot_with_multiple_extensions(
+        plot_dir=dataset_results_dir, plot_title="test_feat_in_train_feat_subspace"
     )
 
     plt.close()
@@ -423,13 +416,11 @@ for dataset_name, dataset_fn in regression_datasets:
         label="Test = 0",
     )
     ax.set_xlabel("Num. Training Samples")
-    ax.set_title("Condition: No Residuals in Ideal Fit")
+    ax.set_title("Ablation: No Residuals in Ideal Fit")
     ax.axvline(x=X.shape[1], color="black", linestyle="--")
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale("log")
     ax.legend()
-    plt.savefig(
-        os.path.join(dataset_results_dir, f"no_residuals_in_ideal"),
-        bbox_inches="tight",
-        dpi=300,
+    save_plot_with_multiple_extensions(
+        plot_dir=dataset_results_dir, plot_title="no_residuals_in_ideal"
     )
