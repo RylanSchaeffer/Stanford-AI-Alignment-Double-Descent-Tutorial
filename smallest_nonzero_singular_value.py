@@ -72,10 +72,10 @@ ax.invert_yaxis()
 
 ax.set_title("True Data Distribution")
 
-plt.savefig(
-    os.path.join(results_dir, f"data_distribution"), bbox_inches="tight", dpi=300
+save_plot_with_multiple_extensions(
+    plot_dir=results_dir,
+    plot_title="data_distribution",
 )
-plt.show()
 
 
 num_data_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 25, 100]
