@@ -182,7 +182,7 @@ for dataset_name, dataset_fn in regression_datasets:
     ax.axvline(
         x=X.shape[1], color="black", linestyle="--", label="Interpolation Threshold"
     )
-    ax.set_title("Ablation: None")
+    ax.set_title("Adversarial Manipulation: None")
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale("log")
     ax.legend()
@@ -211,7 +211,7 @@ for dataset_name, dataset_fn in regression_datasets:
         palette="OrRd",
     )
     ax.set_xlabel("Num. Training Samples")
-    ax.set_title("Ablation: Adversarial Test Datum")
+    ax.set_title("Adversarial Manipulation: Test Datum")
     ax.axvline(x=X.shape[1], color="black", linestyle="--")
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale("log")
@@ -240,7 +240,7 @@ for dataset_name, dataset_fn in regression_datasets:
         palette="OrRd",
     )
     ax.set_xlabel("Num. Training Samples")
-    ax.set_title("Ablation: Adversarial Training Data")
+    ax.set_title("Adversarial Manipulation: Training Data")
     ax.axvline(x=X.shape[1], color="black", linestyle="--")
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale("log")
