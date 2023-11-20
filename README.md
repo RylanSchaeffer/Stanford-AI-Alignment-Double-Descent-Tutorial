@@ -3,7 +3,6 @@
 This repository contains the code and data for our preprint
 ["Double Descent Demystified: Identifying, Interpreting \& Ablating the Sources of a Deep Learning Puzzle"](https://arxiv.org/abs/2303.14151).
 
-
 <p align="middle">
   <img align="top" src="results/real_data_ablations/WHO%20Life%20Expectancy/unablated.png" width="95%" />
 </p>
@@ -41,8 +40,8 @@ Run [linear_regression_ablations.py](linear_regression_ablations.py).
 Run [linear_regression_adversarial.py](linear_regression_adversarial.py).
 
 <p align="middle">
-  <img align="top" src="results/real_data_adversarial/California%20Housing/adversarial_test_datum.pdf" width="45%" />
-<img align="top" src="results/real_data_adversarial/California%20Housing/adversarial_train_data.pdf" width="45%" />
+  <img align="top" src="results/real_data_adversarial/California%20Housing/adversarial_test_datum.png" width="45%" />
+<img align="top" src="results/real_data_adversarial/California%20Housing/adversarial_train_data.png" width="45%" />
 </p>
 
 ### Geometric Intuition for Smallest Non-Zero Singular Value
