@@ -5,7 +5,6 @@ This repository contains the code and data for our preprint
 
 For a step-by-step explanation, see [the walkthrough](walkthrough.md). The walkthrough contains mathematical intuition via ordinary linear regression, visual intuition via polynomial regression, and ablations in linear regression on real data.
 
-- For ordinary linear regression on real and synthetic data, see [linear_regression.py](linear_regression.py).
 - For ordinary linear regression on real and synthetic data with ablations of double descent, see [linear_regression_ablations.py](linear_regression_ablations.py) 
 - For polynomial regression on synthetic data, see [polynomial_regression.py](polynomial_regression.py).
 
@@ -35,7 +34,23 @@ To activate the environment:
 
 ## Running
 
+### Double Descent in Linear Regression
 
+Run [linear_regression_ablations.py](linear_regression_ablations.py).
+
+### Adversarial Training and Test Data in Linear Regression
+
+Run [linear_regression_adversarial.py](linear_regression_adversarial.py).
+
+### Geometric Intuition for Smallest Non-Zero Singular Value
+
+Run [smallest_nonzero_singular_value.py](smallest_nonzero_singular_value.py)
+
+[](results/smallest_nonzero_singular_value/data_distribution_num_data=9.png)
+
+### Double Descent in Polynomial Regression
+
+Run [polynomial_regression.py](polynomial_regression.py).
 
 ## Contributing
 

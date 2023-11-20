@@ -10,9 +10,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import PolynomialFeatures
 
-
-# Set style
-sns.set_style("whitegrid")
+from src.plot import save_plot_with_multiple_extensions
 
 # Set seed for reproducibility.
 np.random.seed(0)
@@ -168,11 +166,7 @@ for num_data in num_data_list:
         x=num_data, color="black", linestyle="--", label="Interpolation Threshold"
     )
     plt.legend()
-    for extension in ["pdf", "png"]:
-        plt.savefig(
-            os.path.join(results_num_data_dir, f"mse_num_data={num_data}.{extension}"),
-            bbox_inches="tight",
-            dpi=300,
-        )
-    plt.show()
-    plt.close()
+    save_plot_with_multiple_extensions(
+        plot_dir=results_num_data_dir, plot_title=f"mse_num_data={num_data}"
+    )
+    # plt.show()
