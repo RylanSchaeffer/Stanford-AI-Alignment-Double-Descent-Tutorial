@@ -11,8 +11,8 @@ import seaborn as sns
 sns.set_theme(style="whitegrid")
 
 # This must come second. Otherwise, whitegrid overwrites the size.
-matplotlib.rcParams.update({"font.size": 25})
-# sns.set(font_scale=1)
+matplotlib.rcParams.update({"font.size": 50})
+# sns.set(font_scale=1.1)
 
 
 class Arrow3D(FancyArrowPatch):

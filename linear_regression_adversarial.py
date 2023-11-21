@@ -9,11 +9,8 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from typing import Tuple
 
-from src.plot import save_plot_with_multiple_extensions
+import src.plot
 from src.utils import ylim_by_dataset, generate_synthetic_data, load_who_life_expectancy
-
-# Set style
-sns.set_style("whitegrid")
 
 # Set seed for reproducibility.
 np.random.seed(0)
@@ -119,7 +116,7 @@ for dataset_name, dataset_fn in regression_datasets:
                         "Train MSE": train_mse_unablated,
                         "Test MSE": test_mse_adversarial_test_datum,
                         "Repeat Index": repeat_idx,
-                        "Adversarial Test Datum Prefactor": adversarial_test_datum_prefactor,
+                        "Adversarial Test\nDatum Prefactor": adversarial_test_datum_prefactor,
                     }
                 )
             # End: Adversarial test datum.
@@ -148,7 +145,7 @@ for dataset_name, dataset_fn in regression_datasets:
                         "Train MSE": train_mse_adversarial_train_data,
                         "Test MSE": test_mse_adversarial_train_data,
                         "Repeat Index": repeat_idx,
-                        "Adversarial Train Data Prefactor": adversarial_train_data_prefactor,
+                        "Adversarial Train\nData Prefactor": adversarial_train_data_prefactor,
                     }
                 )
                 pass
@@ -162,7 +159,6 @@ for dataset_name, dataset_fn in regression_datasets:
 
     plt.close()
     fig, ax = plt.subplots(figsize=(6, 5))
-    fig.suptitle(f"Dataset: {dataset_name}")
     sns.lineplot(
         data=dataset_loss_unablated_df,
         x="Subset Size",
@@ -182,22 +178,21 @@ for dataset_name, dataset_fn in regression_datasets:
     ax.axvline(
         x=X.shape[1], color="black", linestyle="--", label="Interpolation Threshold"
     )
-    ax.set_title("Adversarial Manipulation: None")
+    ax.set_title(f"Dataset: {dataset_name}\nAdversarial Manipulation: None")
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale("log")
     ax.legend()
-    save_plot_with_multiple_extensions(
+    src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir, plot_title="unablated"
     )
 
     plt.close()
     fig, ax = plt.subplots(figsize=(6, 5))
-    fig.suptitle(f"Dataset: {dataset_name}")
     sns.lineplot(
         data=dataset_adversarial_test_datum_df,
         x="Subset Size",
         y="Train MSE",
-        hue="Adversarial Test Datum Prefactor",
+        hue="Adversarial Test\nDatum Prefactor",
         legend=False,
         ax=ax,
         palette="PuBu",
@@ -206,27 +201,26 @@ for dataset_name, dataset_fn in regression_datasets:
         data=dataset_adversarial_test_datum_df,
         x="Subset Size",
         y=f"Test MSE",
-        hue="Adversarial Test Datum Prefactor",
+        hue="Adversarial Test\nDatum Prefactor",
         ax=ax,
         palette="OrRd",
     )
     ax.set_xlabel("Num. Training Samples")
-    ax.set_title("Adversarial Manipulation: Test Datum")
+    ax.set_title(f"Dataset: {dataset_name}\nAdversarial Manipulation: Test Datum")
     ax.axvline(x=X.shape[1], color="black", linestyle="--")
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale("log")
-    save_plot_with_multiple_extensions(
+    src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir, plot_title="adversarial_test_datum"
     )
 
     plt.close()
     fig, ax = plt.subplots(figsize=(6, 5))
-    fig.suptitle(f"Dataset: {dataset_name}")
     sns.lineplot(
         data=dataset_adversarial_train_data_df,
         x="Subset Size",
         y="Train MSE",
-        hue="Adversarial Train Data Prefactor",
+        hue="Adversarial Train\nData Prefactor",
         legend=False,
         ax=ax,
         palette="PuBu",
@@ -235,16 +229,16 @@ for dataset_name, dataset_fn in regression_datasets:
         data=dataset_adversarial_train_data_df,
         x="Subset Size",
         y=f"Test MSE",
-        hue="Adversarial Train Data Prefactor",
+        hue="Adversarial Train\nData Prefactor",
         ax=ax,
         palette="OrRd",
     )
     ax.set_xlabel("Num. Training Samples")
-    ax.set_title("Adversarial Manipulation: Training Data")
+    ax.set_title(f"Dataset: {dataset_name}\nAdversarial Manipulation: Training Data")
     ax.axvline(x=X.shape[1], color="black", linestyle="--")
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale("log")
-    save_plot_with_multiple_extensions(
+    src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir, plot_title="adversarial_train_data"
     )
 

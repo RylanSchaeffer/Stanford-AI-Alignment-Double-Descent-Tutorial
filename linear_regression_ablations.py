@@ -9,7 +9,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from typing import Tuple
 
-from src.plot import save_plot_with_multiple_extensions
+import src.plot
 from src.utils import generate_synthetic_data, load_who_life_expectancy
 
 
@@ -216,7 +216,6 @@ for dataset_name, dataset_fn in regression_datasets:
 
     plt.close()
     fig, ax = plt.subplots(figsize=(6, 5))
-    fig.suptitle(f"Dataset: {dataset_name}")
     sns.lineplot(
         data=dataset_loss_unablated_df,
         x="Subset Size",
@@ -236,17 +235,16 @@ for dataset_name, dataset_fn in regression_datasets:
     ax.axvline(
         x=X.shape[1], color="black", linestyle="--", label="Interpolation Threshold"
     )
-    ax.set_title("Ablation: None")
+    ax.set_title(f"Dataset: {dataset_name}")
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale("log")
     ax.legend()
-    save_plot_with_multiple_extensions(
+    src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir, plot_title="unablated"
     )
 
     plt.close()
     fig, ax = plt.subplots(figsize=(6, 5))
-    fig.suptitle(f"Dataset: {dataset_name}")
     sns.lineplot(
         data=dataset_loss_unablated_df,
         x="Subset Size",
@@ -259,9 +257,10 @@ for dataset_name, dataset_fn in regression_datasets:
     ax.axvline(
         x=X.shape[1], color="black", linestyle="--", label="Interpolation Threshold"
     )
+    ax.set_title(f"Dataset: {dataset_name}")
     ax.set_yscale("log")
     ax.legend()
-    save_plot_with_multiple_extensions(
+    src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir,
         plot_title="least_informative_singular_value",
     )
@@ -275,7 +274,6 @@ for dataset_name, dataset_fn in regression_datasets:
     )
     plt.close()
     fig, ax = plt.subplots(figsize=(6, 5))
-    fig.suptitle(f"Dataset: {dataset_name}")
     sns.lineplot(
         data=dataset_loss_unablated_df,
         x="Subset Size",
@@ -312,16 +310,16 @@ for dataset_name, dataset_fn in regression_datasets:
             label="Test = 0",
         )
         ax.set_ylim(bottom=test_bias_squared_ymin)
+    ax.set_title(f"Dataset: {dataset_name}")
     ax.set_yscale("log")
     ax.legend()
-    save_plot_with_multiple_extensions(
+    src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir, plot_title="test_bias_squared"
     )
     # plt.show()
 
     plt.close()
     fig, ax = plt.subplots(figsize=(6, 5))
-    fig.suptitle(f"Dataset: {dataset_name}")
     dataset_loss_no_small_singular_values_df = pd.DataFrame(
         dataset_loss_no_small_singular_values_df
     )
@@ -345,18 +343,17 @@ for dataset_name, dataset_fn in regression_datasets:
         palette="OrRd",
     )
     ax.set_xlabel("Num. Training Samples")
-    ax.set_title("Ablation: No Small Singular Values")
+    ax.set_title(f"Dataset: {dataset_name}\nAblation: No Small Singular Values")
     ax.axvline(x=X.shape[1], color="black", linestyle="--")
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale("log")
-    save_plot_with_multiple_extensions(
+    src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir,
         plot_title="no_small_singular_values",
     )
 
     plt.close()
     fig, ax = plt.subplots(figsize=(6, 5))
-    fig.suptitle(f"Dataset: {dataset_name}")
     dataset_loss_test_features_in_training_feature_subspace_df = pd.DataFrame(
         dataset_loss_test_features_in_training_feature_subspace_df
     )
@@ -378,17 +375,18 @@ for dataset_name, dataset_fn in regression_datasets:
         palette="OrRd",
     )
     ax.set_xlabel("Num. Training Samples")
-    ax.set_title("Ablation: Test Features in Training Feature Subspace")
+    ax.set_title(
+        f"Dataset: {dataset_name}\nAblation: Test Features in Training Feature Subspace"
+    )
     ax.axvline(x=X.shape[1], color="black", linestyle="--")
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale("log")
-    save_plot_with_multiple_extensions(
+    src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir, plot_title="test_feat_in_train_feat_subspace"
     )
 
     plt.close()
     fig, ax = plt.subplots(figsize=(6, 5))
-    fig.suptitle(f"Dataset: {dataset_name}")
     dataset_loss_no_residuals_in_ideal_fit_df = pd.DataFrame(
         dataset_loss_no_residuals_in_ideal_fit_df
     )
@@ -416,11 +414,11 @@ for dataset_name, dataset_fn in regression_datasets:
         label="Test = 0",
     )
     ax.set_xlabel("Num. Training Samples")
-    ax.set_title("Ablation: No Residuals in Ideal Fit")
+    ax.set_title(f"Dataset: {dataset_name}\nAblation: No Residuals in Ideal Fit")
     ax.axvline(x=X.shape[1], color="black", linestyle="--")
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_yscale("log")
     ax.legend()
-    save_plot_with_multiple_extensions(
+    src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir, plot_title="no_residuals_in_ideal"
     )
