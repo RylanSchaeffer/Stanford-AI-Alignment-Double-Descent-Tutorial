@@ -3,10 +3,8 @@ import os
 import numpy as np
 import seaborn as sns
 
-from src.plot import Arrow3D, save_plot_with_multiple_extensions
+import src.plot
 
-# Set style
-sns.set_style("whitegrid")
 
 # Set seed for reproducibility.
 np.random.seed(0)
@@ -47,7 +45,7 @@ for eigidx, (eigval, eigvec) in enumerate(zip(eigvals, eigvecs.T)):
     scaled_eigvec = eigval * eigvec
     prefactors = [-1.0, 1.0]
     for prefactor in prefactors:
-        drawvec = Arrow3D(
+        drawvec = src.plot.Arrow3D(
             [0, prefactor * scaled_eigvec[0]],
             [0, prefactor * scaled_eigvec[1]],
             [0, prefactor * scaled_eigvec[2]],
@@ -72,7 +70,7 @@ ax.invert_yaxis()
 
 ax.set_title("True Data Distribution")
 
-save_plot_with_multiple_extensions(
+src.plot.save_plot_with_multiple_extensions(
     plot_dir=results_dir,
     plot_title="data_distribution",
 )
@@ -103,7 +101,7 @@ for num_data in num_data_list:
         scaled_eigvec = eigval * eigvec
         prefactors = [-1.0, 1.0]
         for prefactor in prefactors:
-            drawvec = Arrow3D(
+            drawvec = src.plot.Arrow3D(
                 [0, prefactor * scaled_eigvec[0]],
                 [0, prefactor * scaled_eigvec[1]],
                 [0, prefactor * scaled_eigvec[2]],
@@ -127,7 +125,7 @@ for num_data in num_data_list:
 
     ax.set_title("Num Data: {}".format(num_data))
 
-    save_plot_with_multiple_extensions(
+    src.plot.save_plot_with_multiple_extensions(
         plot_dir=results_dir,
         plot_title=f"data_distribution_num_data={num_data}",
     )
