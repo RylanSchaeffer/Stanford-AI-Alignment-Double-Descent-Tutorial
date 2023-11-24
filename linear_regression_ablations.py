@@ -123,7 +123,7 @@ for dataset_name, dataset_fn in regression_datasets:
                         "Train MSE": train_mse_cutoff,
                         "Test MSE": test_mse_cutoff,
                         "Repeat Index": repeat_idx,
-                        "Singular Value Cutoff": cutoff,
+                        "Singular Value\nCutoff": cutoff,
                     }
                 )
             # END: No small singular values.
@@ -198,7 +198,7 @@ for dataset_name, dataset_fn in regression_datasets:
                         "Train MSE": train_mse_test_features_in_training_feature_subspace,
                         "Test MSE": test_mse_test_features_in_training_feature_subspace,
                         "Repeat Index": repeat_idx,
-                        "Num. Leading Singular\nModes to Keep": num_leading_sing_modes,
+                        "Num. Leading\nSingular Modes\nto Keep": num_leading_sing_modes,
                     }
                 )
             # END: Test datum features in training feature subspace.
@@ -222,7 +222,7 @@ for dataset_name, dataset_fn in regression_datasets:
     )
 
     plt.close()
-    fig, ax = plt.subplots(figsize=(6, 5))
+    fig, ax = plt.subplots(figsize=(7, 5))
     sns.lineplot(
         data=dataset_loss_unablated_df,
         x="Num Parameters / Num. Training Samples",
@@ -239,12 +239,13 @@ for dataset_name, dataset_fn in regression_datasets:
     )
     ax.set_xlabel("Num Parameters / Num. Training Samples")
     ax.set_ylabel("Mean Squared Error")
-    ax.axvline(x=1.0, color="black", linestyle="--", label="Interpolation Threshold")
+    ax.axvline(x=1.0, color="black", linestyle="--", label="Interpolation\nThreshold")
     ax.set_title(f"Dataset: {dataset_name}")
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.legend()
+    sns.move_legend(obj=ax, loc="upper left", bbox_to_anchor=(1.0, 1.0))
     src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir, plot_title="unablated"
     )
@@ -260,11 +261,10 @@ for dataset_name, dataset_fn in regression_datasets:
     )
     ax.set_xlabel("Num Parameters / Num. Training Samples")
     ax.set_ylabel("Smallest Non-Zero Singular\nValue of Training Features " + r"$X$")
-    ax.axvline(x=1.0, color="black", linestyle="--", label="Interpolation Threshold")
+    ax.axvline(x=1.0, color="black", linestyle="--")
     ax.set_title(f"Dataset: {dataset_name}")
     ax.set_xscale("log")
     ax.set_yscale("log")
-    ax.legend()
     src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir,
         plot_title="least_informative_singular_value",
@@ -289,7 +289,7 @@ for dataset_name, dataset_fn in regression_datasets:
     ax.set_xlabel("Num Parameters / Num. Training Samples")
     # ax.set_ylabel(r'$(\hat{\vec{x}}_{test} - \vec{x}_{test}) \cdot \beta^*$')
     ax.set_ylabel("Test Bias Squared")
-    ax.axvline(x=1.0, color="black", linestyle="--", label="Interpolation Threshold")
+    ax.axvline(x=1.0, color="black", linestyle="--")
     if dataset_name == "Diabetes":
         # The squared test bias for diabetes is 1e-26. This looks terrible so just overwrite it.
         # The test bias will be 0 for all subset sizes >= X.shape[1]
@@ -326,14 +326,13 @@ for dataset_name, dataset_fn in regression_datasets:
     ax.set_title(f"Dataset: {dataset_name}")
     ax.set_xscale("log")
     ax.set_yscale("log")
-    ax.legend()
     src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir, plot_title="test_bias_squared"
     )
     # plt.show()
 
     plt.close()
-    fig, ax = plt.subplots(figsize=(6, 5))
+    fig, ax = plt.subplots(figsize=(7, 5))
     dataset_loss_no_small_singular_values_df = pd.DataFrame(
         dataset_loss_no_small_singular_values_df
     )
@@ -347,7 +346,7 @@ for dataset_name, dataset_fn in regression_datasets:
         data=dataset_loss_no_small_singular_values_df,
         x="Num Parameters / Num. Training Samples",
         y="Train MSE",
-        hue="Singular Value Cutoff",
+        hue="Singular Value\nCutoff",
         legend=False,
         ax=ax,
         hue_norm=LogNorm(),
@@ -357,7 +356,7 @@ for dataset_name, dataset_fn in regression_datasets:
         data=dataset_loss_no_small_singular_values_df,
         x="Num Parameters / Num. Training Samples",
         y=f"Test MSE",
-        hue="Singular Value Cutoff",
+        hue="Singular Value\nCutoff",
         ax=ax,
         hue_norm=LogNorm(),
         palette="OrRd",
@@ -368,14 +367,14 @@ for dataset_name, dataset_fn in regression_datasets:
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_xscale("log")
     ax.set_yscale("log")
-    sns.move_legend(obj=ax, loc="upper right")
+    sns.move_legend(obj=ax, loc="upper left", bbox_to_anchor=(1.0, 1.0))
     src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir,
         plot_title="no_small_singular_values",
     )
 
     plt.close()
-    fig, ax = plt.subplots(figsize=(6, 5))
+    fig, ax = plt.subplots(figsize=(7, 5))
     dataset_loss_test_features_in_training_feature_subspace_df = pd.DataFrame(
         dataset_loss_test_features_in_training_feature_subspace_df
     )
@@ -389,7 +388,7 @@ for dataset_name, dataset_fn in regression_datasets:
         data=dataset_loss_test_features_in_training_feature_subspace_df,
         x="Num Parameters / Num. Training Samples",
         y="Train MSE",
-        hue="Num. Leading Singular\nModes to Keep",
+        hue="Num. Leading\nSingular Modes\nto Keep",
         legend=False,
         ax=ax,
         palette="PuBu",
@@ -398,7 +397,7 @@ for dataset_name, dataset_fn in regression_datasets:
         data=dataset_loss_test_features_in_training_feature_subspace_df,
         x="Num Parameters / Num. Training Samples",
         y=f"Test MSE",
-        hue="Num. Leading Singular\nModes to Keep",
+        hue="Num. Leading\nSingular Modes\nto Keep",
         ax=ax,
         palette="OrRd",
     )
@@ -410,13 +409,13 @@ for dataset_name, dataset_fn in regression_datasets:
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_xscale("log")
     ax.set_yscale("log")
-    sns.move_legend(obj=ax, loc="upper right")
+    sns.move_legend(obj=ax, loc="upper left", bbox_to_anchor=(1.0, 1.0))
     src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir, plot_title="test_feat_in_train_feat_subspace"
     )
 
     plt.close()
-    fig, ax = plt.subplots(figsize=(6, 5))
+    fig, ax = plt.subplots(figsize=(7, 5))
     dataset_loss_no_residuals_in_ideal_fit_df = pd.DataFrame(
         dataset_loss_no_residuals_in_ideal_fit_df
     )
@@ -465,7 +464,7 @@ for dataset_name, dataset_fn in regression_datasets:
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_xscale("log")
     ax.set_yscale("log")
-    sns.move_legend(obj=ax, loc="upper right")
+    sns.move_legend(obj=ax, loc="upper left", bbox_to_anchor=(1.0, 1.0))
     src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir, plot_title="no_residuals_in_ideal"
     )

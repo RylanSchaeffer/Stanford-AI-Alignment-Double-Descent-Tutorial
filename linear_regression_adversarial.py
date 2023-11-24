@@ -117,7 +117,7 @@ for dataset_name, dataset_fn in regression_datasets:
                         "Train MSE": train_mse_unablated,
                         "Test MSE": test_mse_adversarial_test_datum,
                         "Repeat Index": repeat_idx,
-                        "Prefactor": adversarial_test_datum_prefactor,
+                        "Adversarial Test\nDatum Prefactor": adversarial_test_datum_prefactor,
                     }
                 )
             # End: Adversarial test datum.
@@ -147,7 +147,7 @@ for dataset_name, dataset_fn in regression_datasets:
                         "Train MSE": train_mse_adversarial_train_data,
                         "Test MSE": test_mse_adversarial_train_data,
                         "Repeat Index": repeat_idx,
-                        "Prefactor": adversarial_train_data_prefactor,
+                        "Adversarial Train\nData Prefactor": adversarial_train_data_prefactor,
                     }
                 )
                 pass
@@ -173,7 +173,7 @@ for dataset_name, dataset_fn in regression_datasets:
     ymin, ymax = ylim_by_dataset[dataset_name]
 
     plt.close()
-    fig, ax = plt.subplots(figsize=(6, 5))
+    fig, ax = plt.subplots(figsize=(7, 5))
     sns.lineplot(
         data=dataset_loss_unablated_df,
         x="Num Parameters / Num. Training Samples",
@@ -195,18 +195,18 @@ for dataset_name, dataset_fn in regression_datasets:
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_xscale("log")
     ax.set_yscale("log")
-    sns.move_legend(obj=ax, loc="upper right")
+    sns.move_legend(obj=ax, loc="upper left", bbox_to_anchor=(1.0, 1.0))
     src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir, plot_title="unablated"
     )
 
     plt.close()
-    fig, ax = plt.subplots(figsize=(6, 5))
+    fig, ax = plt.subplots(figsize=(7, 5))
     sns.lineplot(
         data=dataset_adversarial_test_datum_df,
         x="Num Parameters / Num. Training Samples",
         y="Train MSE",
-        hue="Prefactor",
+        hue="Adversarial Test\nDatum Prefactor",
         legend=False,
         ax=ax,
         palette="PuBu",
@@ -215,7 +215,7 @@ for dataset_name, dataset_fn in regression_datasets:
         data=dataset_adversarial_test_datum_df,
         x="Num Parameters / Num. Training Samples",
         y=f"Test MSE",
-        hue="Prefactor",
+        hue="Adversarial Test\nDatum Prefactor",
         ax=ax,
         palette="OrRd",
     )
@@ -225,18 +225,18 @@ for dataset_name, dataset_fn in regression_datasets:
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_xscale("log")
     ax.set_yscale("log")
-    sns.move_legend(obj=ax, loc="upper right")
+    sns.move_legend(obj=ax, loc="upper left", bbox_to_anchor=(1.0, 1.0))
     src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir, plot_title="adversarial_test_datum"
     )
 
     plt.close()
-    fig, ax = plt.subplots(figsize=(6, 5))
+    fig, ax = plt.subplots(figsize=(7, 5))
     sns.lineplot(
         data=dataset_adversarial_train_data_df,
         x="Num Parameters / Num. Training Samples",
         y="Train MSE",
-        hue="Prefactor",
+        hue="Adversarial Train\nData Prefactor",
         legend=False,
         ax=ax,
         palette="PuBu",
@@ -245,7 +245,7 @@ for dataset_name, dataset_fn in regression_datasets:
         data=dataset_adversarial_train_data_df,
         x="Num Parameters / Num. Training Samples",
         y=f"Test MSE",
-        hue="Prefactor",
+        hue="Adversarial Train\nData Prefactor",
         ax=ax,
         palette="OrRd",
     )
@@ -255,7 +255,7 @@ for dataset_name, dataset_fn in regression_datasets:
     ax.set_ylim(bottom=ymin, top=ymax)
     ax.set_xscale("log")
     ax.set_yscale("log")
-    sns.move_legend(obj=ax, loc="upper right")
+    sns.move_legend(obj=ax, loc="upper left", bbox_to_anchor=(1.0, 1.0))
     src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir, plot_title="adversarial_train_data"
     )
