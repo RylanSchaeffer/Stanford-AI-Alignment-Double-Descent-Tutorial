@@ -49,8 +49,7 @@ for dataset_name, dataset_fn in regression_datasets:
     dataset_loss_no_residuals_in_ideal_fit_df = []
     dataset_loss_test_features_in_training_feature_subspace_df = []
     for repeat_idx in range(num_repeats):
-        # subset_sizes = np.arange(10, X_train.shape[0], X_train.shape[0] // 20)
-        subset_sizes = np.arange(1, 50, 1)
+        subset_sizes = np.arange(1, 40, 1)
         for subset_size in subset_sizes:
             print(
                 f"Dataset: {dataset_name}, repeat_idx: {repeat_idx}, subset_size: {subset_size}"
@@ -96,6 +95,7 @@ for dataset_name, dataset_fn in regression_datasets:
                 {
                     "Dataset": dataset_name,
                     "Subset Size": subset_size,
+                    "Num Parameters": X.shape[1],
                     "Train MSE": train_mse_unablated,
                     "Test MSE": test_mse_unablated,
                     "Repeat Index": repeat_idx,
@@ -119,6 +119,7 @@ for dataset_name, dataset_fn in regression_datasets:
                     {
                         "Dataset": dataset_name,
                         "Subset Size": subset_size,
+                        "Num Parameters": X.shape[1],
                         "Train MSE": train_mse_cutoff,
                         "Test MSE": test_mse_cutoff,
                         "Repeat Index": repeat_idx,
@@ -146,6 +147,7 @@ for dataset_name, dataset_fn in regression_datasets:
                 {
                     "Dataset": dataset_name,
                     "Subset Size": subset_size,
+                    "Num Parameters": X.shape[1],
                     "Train MSE": train_mse_no_residuals,
                     "Test MSE": test_mse_no_residuals,
                     "Repeat Index": repeat_idx,
@@ -192,15 +194,20 @@ for dataset_name, dataset_fn in regression_datasets:
                     {
                         "Dataset": dataset_name,
                         "Subset Size": subset_size,
+                        "Num Parameters": X.shape[1],
                         "Train MSE": train_mse_test_features_in_training_feature_subspace,
                         "Test MSE": test_mse_test_features_in_training_feature_subspace,
                         "Repeat Index": repeat_idx,
-                        "Num. Leading Singular Modes to Keep": num_leading_sing_modes,
+                        "Num. Leading Singular\nModes to Keep": num_leading_sing_modes,
                     }
                 )
             # END: Test datum features in training feature subspace.
 
     dataset_loss_unablated_df = pd.DataFrame(dataset_loss_unablated_df)
+    dataset_loss_unablated_df["Num Parameters / Num. Training Samples"] = (
+        dataset_loss_unablated_df["Num Parameters"]
+        / dataset_loss_unablated_df["Subset Size"]
+    )
 
     # Set consistent y limits based on the first plot (i.e. the unablated plot).
     ymax = 2 * max(
@@ -218,25 +225,24 @@ for dataset_name, dataset_fn in regression_datasets:
     fig, ax = plt.subplots(figsize=(6, 5))
     sns.lineplot(
         data=dataset_loss_unablated_df,
-        x="Subset Size",
+        x="Num Parameters / Num. Training Samples",
         y=f"Train MSE",
         label="Train",
         ax=ax,
     )
     sns.lineplot(
         data=dataset_loss_unablated_df,
-        x="Subset Size",
+        x="Num Parameters / Num. Training Samples",
         y=f"Test MSE",
         label="Test",
         ax=ax,
     )
-    ax.set_xlabel("Num. Training Samples")
+    ax.set_xlabel("Num Parameters / Num. Training Samples")
     ax.set_ylabel("Mean Squared Error")
-    ax.axvline(
-        x=X.shape[1], color="black", linestyle="--", label="Interpolation Threshold"
-    )
+    ax.axvline(x=1.0, color="black", linestyle="--", label="Interpolation Threshold")
     ax.set_title(f"Dataset: {dataset_name}")
     ax.set_ylim(bottom=ymin, top=ymax)
+    ax.set_xscale("log")
     ax.set_yscale("log")
     ax.legend()
     src.plot.save_plot_with_multiple_extensions(
@@ -247,17 +253,16 @@ for dataset_name, dataset_fn in regression_datasets:
     fig, ax = plt.subplots(figsize=(6, 5))
     sns.lineplot(
         data=dataset_loss_unablated_df,
-        x="Subset Size",
+        x="Num Parameters / Num. Training Samples",
         y="Smallest Non-Zero Singular Value",
         color="green",
         ax=ax,
     )
-    ax.set_xlabel("Num. Training Samples")
+    ax.set_xlabel("Num Parameters / Num. Training Samples")
     ax.set_ylabel("Smallest Non-Zero Singular\nValue of Training Features " + r"$X$")
-    ax.axvline(
-        x=X.shape[1], color="black", linestyle="--", label="Interpolation Threshold"
-    )
+    ax.axvline(x=1.0, color="black", linestyle="--", label="Interpolation Threshold")
     ax.set_title(f"Dataset: {dataset_name}")
+    ax.set_xscale("log")
     ax.set_yscale("log")
     ax.legend()
     src.plot.save_plot_with_multiple_extensions(
@@ -276,23 +281,26 @@ for dataset_name, dataset_fn in regression_datasets:
     fig, ax = plt.subplots(figsize=(6, 5))
     sns.lineplot(
         data=dataset_loss_unablated_df,
-        x="Subset Size",
+        x="Num Parameters / Num. Training Samples",
         y="Test Bias Squared",
         color="purple",
         ax=ax,
     )
-    ax.set_xlabel("Num. Training Samples")
+    ax.set_xlabel("Num Parameters / Num. Training Samples")
     # ax.set_ylabel(r'$(\hat{\vec{x}}_{test} - \vec{x}_{test}) \cdot \beta^*$')
     ax.set_ylabel("Test Bias Squared")
-    ax.axvline(
-        x=X.shape[1], color="black", linestyle="--", label="Interpolation Threshold"
-    )
+    ax.axvline(x=1.0, color="black", linestyle="--", label="Interpolation Threshold")
     if dataset_name == "Diabetes":
         # The squared test bias for diabetes is 1e-26. This looks terrible so just overwrite it.
         # The test bias will be 0 for all subset sizes >= X.shape[1]
         # b/c the linear model exactly fits the linear data.
         ax.plot(
-            [X.shape[1] - 1, dataset_loss_unablated_df["Subset Size"].max()],
+            [
+                dataset_loss_unablated_df[
+                    "Num Parameters / Num. Training Samples"
+                ].min(),
+                1.0,
+            ],
             [1e-2, 1e-2],
             color="purple",
             linestyle="--",
@@ -303,7 +311,12 @@ for dataset_name, dataset_fn in regression_datasets:
         # The test bias will be 0 for all subset sizes >= X.shape[1]
         # b/c the linear model exactly fits the linear data.
         ax.plot(
-            [X.shape[1] - 1, dataset_loss_unablated_df["Subset Size"].max()],
+            [
+                dataset_loss_unablated_df[
+                    "Num Parameters / Num. Training Samples"
+                ].min(),
+                1.0,
+            ],
             [test_bias_squared_ymin, test_bias_squared_ymin],
             color="purple",
             linestyle="--",
@@ -311,6 +324,7 @@ for dataset_name, dataset_fn in regression_datasets:
         )
         ax.set_ylim(bottom=test_bias_squared_ymin)
     ax.set_title(f"Dataset: {dataset_name}")
+    ax.set_xscale("log")
     ax.set_yscale("log")
     ax.legend()
     src.plot.save_plot_with_multiple_extensions(
@@ -323,9 +337,15 @@ for dataset_name, dataset_fn in regression_datasets:
     dataset_loss_no_small_singular_values_df = pd.DataFrame(
         dataset_loss_no_small_singular_values_df
     )
+    dataset_loss_no_small_singular_values_df[
+        "Num Parameters / Num. Training Samples"
+    ] = (
+        dataset_loss_no_small_singular_values_df["Num Parameters"]
+        / dataset_loss_no_small_singular_values_df["Subset Size"]
+    )
     sns.lineplot(
         data=dataset_loss_no_small_singular_values_df,
-        x="Subset Size",
+        x="Num Parameters / Num. Training Samples",
         y="Train MSE",
         hue="Singular Value Cutoff",
         legend=False,
@@ -335,18 +355,20 @@ for dataset_name, dataset_fn in regression_datasets:
     )
     sns.lineplot(
         data=dataset_loss_no_small_singular_values_df,
-        x="Subset Size",
+        x="Num Parameters / Num. Training Samples",
         y=f"Test MSE",
         hue="Singular Value Cutoff",
         ax=ax,
         hue_norm=LogNorm(),
         palette="OrRd",
     )
-    ax.set_xlabel("Num. Training Samples")
+    ax.set_xlabel("Num Parameters / Num. Training Samples")
     ax.set_title(f"Dataset: {dataset_name}\nAblation: No Small Singular Values")
-    ax.axvline(x=X.shape[1], color="black", linestyle="--")
+    ax.axvline(x=1.0, color="black", linestyle="--")
     ax.set_ylim(bottom=ymin, top=ymax)
+    ax.set_xscale("log")
     ax.set_yscale("log")
+    sns.move_legend(obj=ax, loc="upper right")
     src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir,
         plot_title="no_small_singular_values",
@@ -357,30 +379,38 @@ for dataset_name, dataset_fn in regression_datasets:
     dataset_loss_test_features_in_training_feature_subspace_df = pd.DataFrame(
         dataset_loss_test_features_in_training_feature_subspace_df
     )
+    dataset_loss_test_features_in_training_feature_subspace_df[
+        "Num Parameters / Num. Training Samples"
+    ] = (
+        dataset_loss_test_features_in_training_feature_subspace_df["Num Parameters"]
+        / dataset_loss_test_features_in_training_feature_subspace_df["Subset Size"]
+    )
     sns.lineplot(
         data=dataset_loss_test_features_in_training_feature_subspace_df,
-        x="Subset Size",
+        x="Num Parameters / Num. Training Samples",
         y="Train MSE",
-        hue="Num. Leading Singular Modes to Keep",
+        hue="Num. Leading Singular\nModes to Keep",
         legend=False,
         ax=ax,
         palette="PuBu",
     )
     sns.lineplot(
         data=dataset_loss_test_features_in_training_feature_subspace_df,
-        x="Subset Size",
+        x="Num Parameters / Num. Training Samples",
         y=f"Test MSE",
-        hue="Num. Leading Singular Modes to Keep",
+        hue="Num. Leading Singular\nModes to Keep",
         ax=ax,
         palette="OrRd",
     )
-    ax.set_xlabel("Num. Training Samples")
+    ax.set_xlabel("Num Parameters / Num. Training Samples")
     ax.set_title(
         f"Dataset: {dataset_name}\nAblation: Test Features in Training Feature Subspace"
     )
-    ax.axvline(x=X.shape[1], color="black", linestyle="--")
+    ax.axvline(x=1.0, color="black", linestyle="--")
     ax.set_ylim(bottom=ymin, top=ymax)
+    ax.set_xscale("log")
     ax.set_yscale("log")
+    sns.move_legend(obj=ax, loc="upper right")
     src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir, plot_title="test_feat_in_train_feat_subspace"
     )
@@ -390,15 +420,26 @@ for dataset_name, dataset_fn in regression_datasets:
     dataset_loss_no_residuals_in_ideal_fit_df = pd.DataFrame(
         dataset_loss_no_residuals_in_ideal_fit_df
     )
+    dataset_loss_no_residuals_in_ideal_fit_df[
+        "Num Parameters / Num. Training Samples"
+    ] = (
+        dataset_loss_no_residuals_in_ideal_fit_df["Num Parameters"]
+        / dataset_loss_no_residuals_in_ideal_fit_df["Subset Size"]
+    )
     ax.plot(
-        [1, dataset_loss_no_residuals_in_ideal_fit_df["Subset Size"].max()],
+        [
+            dataset_loss_no_residuals_in_ideal_fit_df[
+                "Num Parameters / Num. Training Samples"
+            ].min(),
+            1.0,
+        ],
         [1.1 * ymin, 1.1 * ymin],
         color="tab:blue",
         label="Train = 0",
     )
     sns.lineplot(
         data=dataset_loss_no_residuals_in_ideal_fit_df,
-        x="Subset Size",
+        x="Num Parameters / Num. Training Samples",
         y=f"Test MSE",
         label=r"Test $\neq$ 0",
         ax=ax,
@@ -407,18 +448,24 @@ for dataset_name, dataset_fn in regression_datasets:
     # The test error will be 0 for all subset sizes >= X.shape[1]
     # b/c the linear model exactly fits the linear data.
     ax.plot(
-        [X.shape[1], dataset_loss_no_residuals_in_ideal_fit_df["Subset Size"].max()],
+        [
+            dataset_loss_no_residuals_in_ideal_fit_df[
+                "Num Parameters / Num. Training Samples"
+            ].min(),
+            1.0,
+        ],
         [1.1 * ymin, 1.1 * ymin],
         color="tab:orange",
         linestyle="--",
         label="Test = 0",
     )
-    ax.set_xlabel("Num. Training Samples")
+    ax.set_xlabel("Num Parameters / Num. Training Samples")
     ax.set_title(f"Dataset: {dataset_name}\nAblation: No Residuals in Ideal Fit")
-    ax.axvline(x=X.shape[1], color="black", linestyle="--")
+    ax.axvline(x=1.0, color="black", linestyle="--")
     ax.set_ylim(bottom=ymin, top=ymax)
+    ax.set_xscale("log")
     ax.set_yscale("log")
-    ax.legend()
+    sns.move_legend(obj=ax, loc="upper right")
     src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir, plot_title="no_residuals_in_ideal"
     )

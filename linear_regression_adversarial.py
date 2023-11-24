@@ -54,8 +54,7 @@ for dataset_name, dataset_fn in regression_datasets:
     dataset_adversarial_test_datum_df = []
     dataset_adversarial_train_data_df = []
     for repeat_idx in range(num_repeats):
-        # subset_sizes = np.arange(10, X_train.shape[0], X_train.shape[0] // 20)
-        subset_sizes = np.arange(1, 50, 1)
+        subset_sizes = np.arange(1, 40, 1)
         for subset_size in subset_sizes:
             print(
                 f"Dataset: {dataset_name}, repeat_idx: {repeat_idx}, subset_size: {subset_size}"
@@ -92,6 +91,7 @@ for dataset_name, dataset_fn in regression_datasets:
                 {
                     "Dataset": dataset_name,
                     "Subset Size": subset_size,
+                    "Num Parameters": X.shape[1],
                     "Train MSE": train_mse_unablated,
                     "Test MSE": test_mse_unablated,
                     "Repeat Index": repeat_idx,
@@ -113,10 +113,11 @@ for dataset_name, dataset_fn in regression_datasets:
                     {
                         "Dataset": dataset_name,
                         "Subset Size": subset_size,
+                        "Num Parameters": X.shape[1],
                         "Train MSE": train_mse_unablated,
                         "Test MSE": test_mse_adversarial_test_datum,
                         "Repeat Index": repeat_idx,
-                        "Adversarial Test\nDatum Prefactor": adversarial_test_datum_prefactor,
+                        "Prefactor": adversarial_test_datum_prefactor,
                     }
                 )
             # End: Adversarial test datum.
@@ -142,10 +143,11 @@ for dataset_name, dataset_fn in regression_datasets:
                     {
                         "Dataset": dataset_name,
                         "Subset Size": subset_size,
+                        "Num Parameters": X.shape[1],
                         "Train MSE": train_mse_adversarial_train_data,
                         "Test MSE": test_mse_adversarial_train_data,
                         "Repeat Index": repeat_idx,
-                        "Adversarial Train\nData Prefactor": adversarial_train_data_prefactor,
+                        "Prefactor": adversarial_train_data_prefactor,
                     }
                 )
                 pass
@@ -155,33 +157,45 @@ for dataset_name, dataset_fn in regression_datasets:
     dataset_adversarial_train_data_df = pd.DataFrame(dataset_adversarial_train_data_df)
     dataset_adversarial_test_datum_df = pd.DataFrame(dataset_adversarial_test_datum_df)
 
+    dataset_loss_unablated_df["Num Parameters / Num. Training Samples"] = (
+        dataset_loss_unablated_df["Num Parameters"]
+        / dataset_loss_unablated_df["Subset Size"]
+    )
+    dataset_adversarial_train_data_df["Num Parameters / Num. Training Samples"] = (
+        dataset_adversarial_train_data_df["Num Parameters"]
+        / dataset_adversarial_train_data_df["Subset Size"]
+    )
+    dataset_adversarial_test_datum_df["Num Parameters / Num. Training Samples"] = (
+        dataset_adversarial_test_datum_df["Num Parameters"]
+        / dataset_adversarial_test_datum_df["Subset Size"]
+    )
+
     ymin, ymax = ylim_by_dataset[dataset_name]
 
     plt.close()
     fig, ax = plt.subplots(figsize=(6, 5))
     sns.lineplot(
         data=dataset_loss_unablated_df,
-        x="Subset Size",
+        x="Num Parameters / Num. Training Samples",
         y=f"Train MSE",
         label="Train",
         ax=ax,
     )
     sns.lineplot(
         data=dataset_loss_unablated_df,
-        x="Subset Size",
+        x="Num Parameters / Num. Training Samples",
         y=f"Test MSE",
         label="Test",
         ax=ax,
     )
-    ax.set_xlabel("Num. Training Samples")
+    ax.set_xlabel("Num Parameters / Num. Training Samples")
     ax.set_ylabel("Mean Squared Error")
-    ax.axvline(
-        x=X.shape[1], color="black", linestyle="--", label="Interpolation Threshold"
-    )
+    ax.axvline(x=1.0, color="black", linestyle="--", label="Interpolation Threshold")
     ax.set_title(f"Dataset: {dataset_name}\nAdversarial Manipulation: None")
     ax.set_ylim(bottom=ymin, top=ymax)
+    ax.set_xscale("log")
     ax.set_yscale("log")
-    ax.legend()
+    sns.move_legend(obj=ax, loc="upper right")
     src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir, plot_title="unablated"
     )
@@ -190,26 +204,28 @@ for dataset_name, dataset_fn in regression_datasets:
     fig, ax = plt.subplots(figsize=(6, 5))
     sns.lineplot(
         data=dataset_adversarial_test_datum_df,
-        x="Subset Size",
+        x="Num Parameters / Num. Training Samples",
         y="Train MSE",
-        hue="Adversarial Test\nDatum Prefactor",
+        hue="Prefactor",
         legend=False,
         ax=ax,
         palette="PuBu",
     )
     sns.lineplot(
         data=dataset_adversarial_test_datum_df,
-        x="Subset Size",
+        x="Num Parameters / Num. Training Samples",
         y=f"Test MSE",
-        hue="Adversarial Test\nDatum Prefactor",
+        hue="Prefactor",
         ax=ax,
         palette="OrRd",
     )
-    ax.set_xlabel("Num. Training Samples")
+    ax.set_xlabel("Num Parameters / Num. Training Samples")
     ax.set_title(f"Dataset: {dataset_name}\nAdversarial Manipulation: Test Datum")
-    ax.axvline(x=X.shape[1], color="black", linestyle="--")
+    ax.axvline(x=1.0, color="black", linestyle="--")
     ax.set_ylim(bottom=ymin, top=ymax)
+    ax.set_xscale("log")
     ax.set_yscale("log")
+    sns.move_legend(obj=ax, loc="upper right")
     src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir, plot_title="adversarial_test_datum"
     )
@@ -218,26 +234,28 @@ for dataset_name, dataset_fn in regression_datasets:
     fig, ax = plt.subplots(figsize=(6, 5))
     sns.lineplot(
         data=dataset_adversarial_train_data_df,
-        x="Subset Size",
+        x="Num Parameters / Num. Training Samples",
         y="Train MSE",
-        hue="Adversarial Train\nData Prefactor",
+        hue="Prefactor",
         legend=False,
         ax=ax,
         palette="PuBu",
     )
     sns.lineplot(
         data=dataset_adversarial_train_data_df,
-        x="Subset Size",
+        x="Num Parameters / Num. Training Samples",
         y=f"Test MSE",
-        hue="Adversarial Train\nData Prefactor",
+        hue="Prefactor",
         ax=ax,
         palette="OrRd",
     )
-    ax.set_xlabel("Num. Training Samples")
+    ax.set_xlabel("Num Parameters / Num. Training Samples")
     ax.set_title(f"Dataset: {dataset_name}\nAdversarial Manipulation: Training Data")
-    ax.axvline(x=X.shape[1], color="black", linestyle="--")
+    ax.axvline(x=1.0, color="black", linestyle="--")
     ax.set_ylim(bottom=ymin, top=ymax)
+    ax.set_xscale("log")
     ax.set_yscale("log")
+    sns.move_legend(obj=ax, loc="upper right")
     src.plot.save_plot_with_multiple_extensions(
         plot_dir=dataset_results_dir, plot_title="adversarial_train_data"
     )
